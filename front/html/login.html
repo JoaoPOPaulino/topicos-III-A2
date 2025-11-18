@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinOps Pro - Login</title>
+    <link rel="stylesheet" href="../css/login.css" />
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+
+        <div class="login-card">
+
+            <!-- Logo -->
+            <div class="logo-area">
+                <img src="../imgs/logo-sem-nome.png" alt="FinOps Pro" class="logo">
+                <h1>FinOps Pro</h1>
+                <p class="subtitle">Gestão financeira corporativa multimoeda</p>
+            </div>
+
+            <!-- Form -->
+            <form id="loginForm" class="form">
+
+                <!-- E-mail -->
+                <div class="input-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" placeholder="seuemail@empresa.com" required />
+                    <span class="error-message" id="emailError"></span>
+                </div>
+
+                <!-- Senha com ícone de olho -->
+                <div class="input-group">
+                    <label for="password">Senha</label>
+
+                    <div class="password-wrapper">
+                        <input type="password" id="password" placeholder="••••••••" required />
+                        <span id="togglePassword" class="eye-icon">👁️</span>
+                    </div>
+
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+
+                <!-- Botão -->
+                <button type="submit" class="btn-primary">Entrar</button>
+
+                <a href="#" class="forgot-password">Esqueci minha senha</a>
+            </form>
+
+            <p class="footer">© 2025 FinOps Pro. Todos os direitos reservados.</p>
+        </div>
+    </div>
+
+    <script src="../js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FinOps Pro - Perfil</title>
+    <link rel="stylesheet" href="../css/perfil.css" />
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../imgs/logo-com-nome.png" alt="FinOps Pro" class="sidebar-logo">
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item active">📊 Dashboard</a>
+            <a href="#" class="menu-item">💸 Adiantamentos</a>
+            <a href="#" class="menu-item">🧾 Prestação de Contas</a>
+            <a href="#" class="menu-item">✔️ Aprovações</a>
+            <a href="#" class="menu-item">💳 Pagamentos</a>
+            <a href="#" class="menu-item">🌎 Conversor</a>
+            <a href="#" class="menu-item">📅 Feriados</a>
+            <a href="#" class="menu-item">⚙️ Configurações</a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+
+        <!-- Topbar -->
+        <header class="topbar">
+
+            <button id="menuToggle" class="menu-toggle">☰</button>
+
+            <div class="topbar-right">
+
+                <span class="user-name">Olá, Lucas!</span>
+
+                <div class="user-avatar" id="avatarBtn">L</div>
+
+                <!-- Dropdown -->
+                <div class="dropdown-menu" id="profileMenu" aria-hidden="true">
+                    <a href="perfil.html" class="dropdown-item">👤 Perfil</a>
+                    <a href="login.html" class="dropdown-item logout">🔌 Logout</a>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- Content -->
+        <section class="content">
+            <h1 class="page-title">Meu Perfil</h1>
+
+            <div class="profile-card">
+
+                <!-- left column -->
+                <div class="profile-left">
+                    <div class="profile-avatar">L</div>
+                    <h2 class="profile-name">Lucas Henderson</h2>
+                    <p class="profile-email">lucas@empresa.com</p>
+                </div>
+
+                <!-- right column (form) -->
+                <form class="profile-right" id="profileForm" novalidate>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Nome completo</label>
+                            <input type="text" id="name" value="Lucas Henderson" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">E-mail corporativo</label>
+                            <input type="email" id="email" value="lucas@empresa.com" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="role">Função</label>
+                            <input type="text" id="role" value="Analista de Sistemas" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="department">Departamento</label>
+                            <input type="text" id="department" value="TI" />
+                        </div>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <h3 class="subtitle">Alterar Senha</h3>
+
+                    <!-- Senha atual -->
+                    <div class="form-group">
+                        <label for="currentPassword">Senha atual</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="currentPassword" placeholder="Digite sua senha atual" />
+                            <button type="button" class="eye-icon" data-target="currentPassword" aria-label="Mostrar senha atual">👁️</button>
+                        </div>
+                    </div>
+
+                    <!-- Nova senha -->
+                    <div class="form-group">
+                        <label for="newPassword">Nova senha</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="newPassword" placeholder="Nova senha" />
+                            <button type="button" class="eye-icon" data-target="newPassword" aria-label="Mostrar nova senha">👁️</button>
+                        </div>
+                    </div>
+
+                    <!-- Confirmar nova senha -->
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar nova senha</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirmPassword" placeholder="Repita a nova senha" />
+                            <button type="button" class="eye-icon" data-target="confirmPassword" aria-label="Mostrar confirmação de senha">👁️</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Salvar Alterações</button>
+                </form>
+            </div>
+
+        </section>
+    </div>
+
+    <script src="../js/perfil.js"></script>
+</body>
+</html>

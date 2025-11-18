@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinOps Pro - Dashboard</title>
+
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-header">
+            <img src="../imgs/logo-com-nome.png" alt="FinOps Pro" class="sidebar-logo">
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="#" class="menu-item active">📊 Dashboard</a>
+            <a href="#" class="menu-item">💸 Adiantamentos</a>
+            <a href="#" class="menu-item">🧾 Prestação de Contas</a>
+            <a href="#" class="menu-item">✔️ Aprovações</a>
+            <a href="#" class="menu-item">💳 Pagamentos</a>
+            <a href="#" class="menu-item">🌎 Conversor</a>
+            <a href="#" class="menu-item">📅 Feriados</a>
+            <a href="#" class="menu-item">⚙️ Configurações</a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+
+        <header class="topbar">
+
+            <button id="menuToggle" class="menu-toggle">☰</button>
+
+            <div class="topbar-right">
+
+                <span class="user-name">Olá, Lucas!</span>
+
+                <div class="user-avatar" id="avatarBtn">L</div>
+
+                <!-- MENU DROPDOWN -->
+                <div class="dropdown-menu" id="profileMenu">
+                    <a href="../html/perfil.html" class="dropdown-item">👤 Perfil</a>
+                    <a href="../html/login.html" class="dropdown-item logout">🔌 Logout</a>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- Content -->
+        <section class="content">
+
+            <h1 class="page-title">Dashboard Geral</h1>
+
+            <!-- Cards -->
+            <div class="cards-grid">
+
+                <div class="card">
+                    <h3>Total de Adiantamentos Pendentes</h3>
+                    <p class="value">R$ 4.520,00</p>
+                </div>
+
+                <div class="card">
+                    <h3>Despesas em Revisão</h3>
+                    <p class="value">R$ 2.310,00</p>
+                </div>
+
+                <div class="card">
+                    <h3>Pagamentos Atrasados</h3>
+                    <p class="value">3</p>
+                </div>
+
+                <div class="card">
+                    <h3>Economia Mensal (PTAX)</h3>
+                    <p class="value">R$ 1.280,00</p>
+                </div>
+
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+
+                <div class="chart-card">
+                    <h3>Adiantamentos por Status</h3>
+                    <div class="chart-placeholder">[ GRÁFICO AQUI ]</div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Despesas por Categoria</h3>
+                    <div class="chart-placeholder">[ GRÁFICO AQUI ]</div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+/* ========== RESET BÁSICO ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ========== TIPOGRAFIA ========== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #F4F7FB;
+    color: #1E1E1E;
+}
+
+/* ========== WRAPPER CENTRAL ========== */
+.login-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+}
+
+/* ========== CARD ========== */
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    text-align: center;
+}
+
+/* ========== LOGO ========== */
+.logo {
+    width: 70px;
+    margin-bottom: 12px;
+}
+
+.logo-area h1 {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: #6B7280;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+/* ========== FORM ========== */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ========== CAMPOS ========== */
+.input-group {
+    width: 100%;
+    text-align: left;
+}
+
+.input-group label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Campo normal */
+.input-group input {
+    width: 100%;
+    height: 46px;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.input-group input:focus {
+    border-color: #004AAD;
+    box-shadow: 0 0 6px #004AAD33;
+}
+
+/* ========== SENHA + ÍCONE ========== */
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 40px;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+.eye-icon:hover {
+    opacity: 1;
+}
+
+/* ========== ERROS ========== */
+.error-message {
+    font-size: 13px;
+    margin-top: 4px;
+    color: #E63946;
+    display: none;
+}
+
+/* ========== BOTÃO ========== */
+.btn-primary {
+    background: #004AAD;
+    color: #fff;
+    padding: 12px;
+    height: 46px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    background: #003A8D;
+}
+
+/* ========== LINK ========== */
+.forgot-password {
+    margin-top: 8px;
+    display: block;
+    font-size: 14px;
+    text-decoration: none;
+    color: #004AAD;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* ========== RODAPÉ ========== */
+.footer {
+    margin-top: 26px;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+
+/* XS — telas pequenas (320px a 360px) */
+@media (max-width: 360px) {
+    .login-card {
+        padding: 24px 16px;
+    }
+
+    .logo-area h1 {
+        font-size: 22px;
+    }
+}
+
+/* SM — smartphones padrão (até 480px) */
+@media (max-width: 480px) {
+    .logo-area h1 {
+        font-size: 24px;
+    }
+
+    .btn-primary {
+        font-size: 15px;
+    }
+}
+
+/* MD — tablets até 768px */
+@media (max-width: 768px) {
+    .login-card {
+        max-width: 460px;
+    }
+}
