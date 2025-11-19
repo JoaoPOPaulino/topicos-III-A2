@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinOps Pro - Novo Adiantamento</title>
+    <link rel="stylesheet" href="../css/novo-adiantamento.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-header">
+            <img src="../imgs/logo-com-nome.png" class="sidebar-logo" alt="FinOps Pro">
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">📊 Dashboard</a>
+            <a href="adiantamentos.html" class="menu-item">💸 Adiantamentos</a>
+            <a href="#" class="menu-item">🧾 Prestação de Contas</a>
+            <a href="#" class="menu-item">✔️ Aprovações</a>
+            <a href="#" class="menu-item">💳 Pagamentos</a>
+            <a href="#" class="menu-item">🌎 Conversor</a>
+            <a href="#" class="menu-item">📅 Feriados</a>
+            <a href="#" class="menu-item">⚙️ Configurações</a>
+        </nav>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <button id="menuToggle" class="menu-toggle">☰</button>
+
+            <div class="topbar-right">
+                <span class="user-name">Olá, Lucas!</span>
+                <div class="user-avatar" id="avatarBtn">L</div>
+
+                <div class="dropdown-menu" id="profileMenu">
+                    <a href="perfil.html" class="dropdown-item">👤 Perfil</a>
+                    <a href="login.html" class="dropdown-item logout">🔌 Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <h1 class="page-title">Novo Adiantamento</h1>
+
+            <form id="adiantamentoForm" class="form-container">
+
+                <div class="form-group">
+                    <label>Solicitante</label>
+                    <input type="text" id="solicitante" placeholder="Nome do solicitante" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="descricao" placeholder="Descreva o motivo do adiantamento" required>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Valor</label>
+                        <input type="text" id="valor" placeholder="R$ 0,00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Moeda</label>
+                        <select id="moeda">
+                            <option value="BRL">BRL</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" id="data" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <select id="categoria">
+                        <option value="transporte">Transporte</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="hospedagem">Hospedagem</option>
+                        <option value="material">Material de Escritório</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Anexos (opcional)</label>
+                    <input type="file" id="anexo" multiple>
+                </div>
+
+                <button class="btn-primary" type="submit">Salvar Adiantamento</button>
+
+            </form>
+
+        </section>
+
+    </div>
+
+    <script src="../js/novo-adiantamento.js"></script>
+</body>
+</html>

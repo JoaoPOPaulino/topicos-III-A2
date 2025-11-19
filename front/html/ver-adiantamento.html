@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinOps Pro - Ver Adiantamento</title>
+    <link rel="stylesheet" href="../css/ver-adiantamento.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-header">
+            <img src="../imgs/logo-com-nome.png" class="sidebar-logo" alt="FinOps Pro">
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">📊 Dashboard</a>
+            <a href="adiantamentos.html" class="menu-item">💸 Adiantamentos</a>
+            <a href="#" class="menu-item">🧾 Prestação de Contas</a>
+            <a href="#" class="menu-item">✔️ Aprovações</a>
+            <a href="#" class="menu-item">💳 Pagamentos</a>
+            <a href="#" class="menu-item">🌎 Conversor</a>
+            <a href="#" class="menu-item">📅 Feriados</a>
+            <a href="#" class="menu-item">⚙️ Configurações</a>
+        </nav>
+
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <button id="menuToggle" class="menu-toggle">☰</button>
+
+            <div class="topbar-right">
+                <span class="user-name">Olá, Lucas!</span>
+                <div class="user-avatar" id="avatarBtn">L</div>
+
+                <div class="dropdown-menu" id="profileMenu">
+                    <a href="perfil.html" class="dropdown-item">👤 Perfil</a>
+                    <a href="login.html" class="dropdown-item logout">🔌 Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="page-header">
+                <h1 class="page-title">Detalhes do Adiantamento</h1>
+
+                <div class="header-buttons">
+                    <button class="btn-back" onclick="window.location.href='adiantamentos.html'">Voltar</button>
+                    <button class="btn-edit" id="editBtn" style="display:none;">✏️ Editar</button>
+                </div>
+            </div>
+
+            <!-- DETALHES -->
+            <div class="card" id="detalhesCard">
+
+                <div class="details-grid">
+
+                    <div class="detail-item">
+                        <label>ID</label>
+                        <p id="det-id">1001</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Solicitante</label>
+                        <p id="det-solicitante">Lucas Henderson</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Status</label>
+                        <span id="det-status" class="tag pendente">Aprovado</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Descrição</label>
+                        <p id="det-descricao">Viagem Brasília</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Data</label>
+                        <p id="det-data">31/01/2025</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Categoria</label>
+                        <p id="det-categoria">Transporte</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Valor</label>
+                        <p id="det-valor">R$ 850,00</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Moeda</label>
+                        <p id="det-moeda">BRL</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Código PTAX</label>
+                        <p id="det-ptax">5.12</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ANEXOS -->
+            <div class="card">
+                <h2 class="section-title">Anexos</h2>
+                <div id="anexosArea" class="attachments"></div>
+            </div>
+
+            <!-- HISTÓRICO -->
+            <div class="card">
+                <h2 class="section-title">Histórico</h2>
+
+                <ul class="timeline" id="timeline">
+                    <li><strong>31/01/2025:</strong> Adiantamento criado</li>
+                    <li><strong>01/02/2025:</strong> Enviado para revisão</li>
+                    <li><strong>02/02/2025:</strong> Aprovado</li>
+                    <li><strong>05/02/2025:</strong> Pago</li>
+                </ul>
+            </div>
+
+        </section>
+
+    </div>
+
+    <script src="../js/ver-adiantamento.js"></script>
+</body>
+</html>
