@@ -1,0 +1,14 @@
+<header class="topbar">
+    <button class="menu-toggle" (click)="toggleSidebar.emit()">☰</button>
+
+    <div class="topbar-right">
+        <span class="user-name">Olá, Lucas!</span>
+        
+        <div class="user-avatar" (click)="isMenuOpen = !isMenuOpen">L</div>
+
+        <div class="dropdown-menu" [class.show-menu]="isMenuOpen">
+            <a routerLink="/perfil" class="dropdown-item">👤 Perfil</a>
+            <a routerLink="/login" class="dropdown-item logout">🔌 Logout</a>
+        </div>
+    </div>
+</header>
