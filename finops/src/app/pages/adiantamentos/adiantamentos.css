@@ -101,13 +101,18 @@
 }
 
 .tag.aprovado {
-    background: #C9F7D4;
-    color: #0F6D3A;
+    background: #a8efeb;
+    color: #026762;
 }
 
 .tag.pago {
     background: #BDF0BD;
     color: #066306;
+}
+
+.tag.atrasado {
+    background: #fcdee0;
+    color: #E63946;
 }
 
 /* BOTÃO VER */

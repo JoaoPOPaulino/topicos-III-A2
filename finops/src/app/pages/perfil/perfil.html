@@ -1,0 +1,79 @@
+<section class="content">
+<h1 class="page-title">Meu Perfil</h1>
+
+<div class="profile-card">
+    <div class="profile-left">
+    <div class="profile-avatar">{{ user.nome ? user.nome.charAt(0) : 'U' }}</div>
+    <h2 class="profile-name">{{ user.nome }}</h2>
+    <p class="profile-email">{{ user.email }}</p>
+    </div>
+
+    <form class="profile-right" (ngSubmit)="salvar()" #f="ngForm">
+    <div class="form-row">
+        <div class="form-group">
+        <label for="nome">Nome completo</label>
+        <input id="nome" name="nome" type="text" [(ngModel)]="user.nome" required />
+        </div>
+
+        <div class="form-group">
+        <label for="email">E-mail corporativo</label>
+        <input id="email" name="email" type="email" [(ngModel)]="user.email" required />
+        </div>
+
+        <div class="form-group">
+        <label for="role">Função</label>
+        <input id="role" name="role" type="text" [(ngModel)]="user.role" />
+        </div>
+
+        <div class="form-group">
+        <label for="department">Departamento</label>
+        <input id="department" name="department" type="text" [(ngModel)]="user.department" />
+        </div>
+    </div>
+
+    <hr class="divider" />
+    <h3 class="subtitle">Alterar Senha</h3>
+
+    <!-- senha atual -->
+    <div class="form-group">
+        <label for="senhaAtual">Senha atual</label>
+        <div class="password-wrapper">
+        <input id="senhaAtual" name="senhaAtual"
+                [type]="camposVisiveis.senhaAtual ? 'text' : 'password'"
+                [(ngModel)]="senhaAtual" />
+        <button type="button" class="eye-icon" (click)="togglePassword('senhaAtual')">
+            {{ camposVisiveis.senhaAtual ? '❌' : '👁️' }}
+        </button>
+        </div>
+    </div>
+
+    <!-- nova senha -->
+    <div class="form-group">
+        <label for="novaSenha">Nova senha</label>
+        <div class="password-wrapper">
+        <input id="novaSenha" name="novaSenha"
+                [type]="camposVisiveis.novaSenha ? 'text' : 'password'"
+                [(ngModel)]="novaSenha" />
+        <button type="button" class="eye-icon" (click)="togglePassword('novaSenha')">
+            {{ camposVisiveis.novaSenha ? '❌' : '👁️' }}
+        </button>
+        </div>
+    </div>
+
+    <!-- confirmar nova senha -->
+    <div class="form-group">
+        <label for="confirmarSenha">Confirmar nova senha</label>
+        <div class="password-wrapper">
+        <input id="confirmarSenha" name="confirmarSenha"
+                [type]="camposVisiveis.confirmarSenha ? 'text' : 'password'"
+                [(ngModel)]="confirmarSenha" />
+        <button type="button" class="eye-icon" (click)="togglePassword('confirmarSenha')">
+            {{ camposVisiveis.confirmarSenha ? '❌' : '👁️' }}
+        </button>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-primary">Salvar Alterações</button>
+    </form>
+</div>
+</section>

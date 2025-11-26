@@ -1,0 +1,108 @@
+/* CONTENT */
+.content {
+    padding: 32px;
+}
+
+/* HEADER WITH BUTTONS */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-back,
+.btn-edit {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-back { background: #004AAD; }
+.btn-edit { background: #0B7C22; }
+
+/* CARD */
+.card {
+    background: white;
+    padding: 28px;
+    border-radius: 14px;
+    margin-top: 24px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
+}
+
+/* GRID DETAILS */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 26px;
+}
+
+.detail-item label {
+    color: #6B7280;
+    font-size: 14px;
+}
+
+.detail-item p,
+.detail-item span {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* STATUS TAG */
+.tag {
+    padding: 8px 16px;
+    display: inline-block;
+    font-weight: 700;
+}
+
+.tag.pendente { color: #9A7B00;}
+.tag.revisão { color: #0B4DA3;}
+.tag.aprovado {color: #026762;}
+.tag.pago { color: #066306;}
+.tag.atrasado {color: #E63946;}
+
+/* ATTACHMENTS */
+.attachments {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.attachments a {
+    padding: 8px 14px;
+    background: #EDF2FA;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #004AAD;
+    font-weight: 600;
+    border: 1px solid #D8E2F2;
+}
+
+/* TIMELINE */
+.timeline {
+    list-style: none;
+    padding-left: 16px;
+    border-left: 4px solid #004AAD;
+}
+
+.timeline li {
+    padding: 12px 0;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .page-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+}

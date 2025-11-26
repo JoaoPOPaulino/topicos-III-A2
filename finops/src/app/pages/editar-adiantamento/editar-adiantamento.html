@@ -1,0 +1,73 @@
+  <section class="content">
+
+    <div class="page-header">
+      <h1 class="page-title">Editar Adiantamento</h1>
+
+      <div class="header-buttons">
+        <button class="btn-back" routerLink="/ver-adiantamento">
+          Voltar
+        </button>
+      </div>
+    </div>
+
+    <form class="form-container" [formGroup]="adiantamentoForm" (ngSubmit)="submit()">
+
+      <div class="form-group">
+        <label>Solicitante</label>
+        <input type="text" formControlName="solicitante">
+      </div>
+
+      <div class="form-group">
+        <label>Descrição</label>
+        <input type="text" formControlName="descricao">
+      </div>
+
+      <div class="row">
+
+        <div class="form-group">
+          <label>Valor</label>
+          <input
+            type="text"
+            formControlName="valor"
+            (input)="onValorInput($event)"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Moeda</label>
+          <select formControlName="moeda">
+            <option value="BRL">BRL</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" formControlName="data">
+        </div>
+
+      </div>
+
+      <div class="form-group">
+        <label>Categoria</label>
+        <select formControlName="categoria">
+          <option value="transporte">Transporte</option>
+          <option value="alimentacao">Alimentação</option>
+          <option value="hospedagem">Hospedagem</option>
+          <option value="material">Material de Escritório</option>
+          <option value="outros">Outros</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Anexos (opcional)</label>
+        <input type="file" formControlName="anexo" multiple>
+      </div>
+
+      <button class="btn-primary" type="submit">
+        Salvar Adiantamento
+      </button>
+
+    </form>
+  </section>

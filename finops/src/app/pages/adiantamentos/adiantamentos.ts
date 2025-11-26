@@ -24,7 +24,7 @@ export class Adiantamentos {
   dados = [
     { id: 1001, nome: "Lucas Henderson", desc: "Viagem Brasília", valor: "R$ 850,00", moeda: "BRL", data: "2025-01-31", status: "pendente" },
     { id: 1002, nome: "Ana Costa", desc: "Compra materiais", valor: "$ 320.00", moeda: "USD", data: "2025-02-02", status: "revisão" },
-    { id: 1003, nome: "Carlos Silva", desc: "Alimentação", valor: "R$ 150,00", moeda: "BRL", data: "2025-02-02", status: "aprovado" },
+    { id: 1003, nome: "Carlos Silva", desc: "Alimentação", valor: "R$ 150,00", moeda: "BRL", data: "2025-02-02", status: "atrasado" },
     { id: 1004, nome: "Mariana Torres", desc: "Hotel", valor: "€ 210,00", moeda: "EUR", data: "2025-01-28", status: "pago" },
     { id: 1005, nome: "João Paulo", desc: "Taxi", valor: "R$ 45,00", moeda: "BRL", data: "2025-02-04", status: "pendente" },
 

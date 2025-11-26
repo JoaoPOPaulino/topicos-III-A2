@@ -1,0 +1,97 @@
+<section class="content">
+
+<div class="page-header">
+    <h1 class="page-title">Detalhes do Adiantamento</h1>
+
+    <div class="header-buttons">
+        <button class="btn-back" (click)="voltar()">Voltar</button>
+
+        <button class="btn-edit"
+                *ngIf="dados.status === 'pendente' || dados.status === 'revisão'"
+                (click)="editar()">
+            ✏️ Editar
+        </button>
+    </div>
+</div>
+
+<!-- DETALHES -->
+<div class="card">
+    <div class="details-grid">
+
+        <div class="detail-item">
+            <label>ID</label>
+            <p>{{ dados.id }}</p>
+        </div>
+
+        <div class="detail-item">
+            <label>Solicitante</label>
+            <p>{{ dados.solicitante }}</p>
+        </div>
+
+        <div class="detail-item">
+            <label>Status</label>
+            <span class="tag"
+                    [class]=" 'tag ' + dados.status ">
+                {{ dados.status }}
+            </span>
+        </div>
+
+        <div class="detail-item">
+            <label>Descrição</label>
+            <p>{{ dados.descricao }}</p>
+        </div>
+
+        <div class="detail-item">
+            <label>Data</label>
+            <p>{{ dados.data | date: 'dd/MM/yyyy' }}</p>
+        </div>
+
+        <div class="detail-item">
+            <label>Categoria</label>
+            <p>{{ dados.categoria }}</p>
+        </div>
+
+        <div class="detail-item">
+            <label>Valor</label>
+            <p>{{ dados.valor }}</p>
+        </div>
+
+        <div class="detail-item">
+            <label>Moeda</label>
+            <p>{{ dados.moeda }}</p>
+        </div>
+
+        <div class="detail-item">
+            <label>Código PTAX</label>
+            <p>{{ dados.ptax }}</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- ANEXOS -->
+<div class="card">
+    <h2 class="section-title">Anexos</h2>
+
+    <div class="attachments">
+        <a *ngFor="let a of dados.anexos"
+            [href]="'/assets/arquivos/' + a"
+            download="{{ a }}">
+            {{ a }}
+        </a>
+    </div>
+</div>
+
+<!-- HISTÓRICO -->
+<div class="card">
+    <h2 class="section-title">Histórico</h2>
+
+    <ul class="timeline">
+        <li><strong>31/01/2025:</strong> Adiantamento criado</li>
+        <li><strong>01/02/2025:</strong> Enviado para revisão</li>
+        <li><strong>02/02/2025:</strong> Aprovado</li>
+        <li><strong>05/02/2025:</strong> Pago</li>
+    </ul>
+</div>
+
+</section>
