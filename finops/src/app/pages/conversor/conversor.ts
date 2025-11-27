@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ChangeDetectorRef } from '@angular/core';
 
 interface ConversionResult {
   from: string;
@@ -16,10 +17,10 @@ interface ConversionResult {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './conversor.html',
-  styleUrl: './conversor.css',
+  styleUrls: ['./conversor.css'],
 })
 export class Conversor {
-  
+
   currencies = ['BRL', 'USD', 'EUR', 'GBP', 'JPY', 'ARS', 'CAD'];
 
   from: string = 'BRL';
@@ -33,7 +34,7 @@ export class Conversor {
   loading = false;
   errorMessage = '';
 
-  constructor() {}
+  constructor(private cdr: ChangeDetectorRef) {}
 
   invertCurrencies() {
     const t = this.from;
@@ -56,6 +57,7 @@ export class Conversor {
     }
 
     this.loading = true;
+    this.cdr.detectChanges(); // Atualiza a tela imediatamente ao iniciar carregamento
 
     try {
       const pair = `${this.from}-${this.to}`;
@@ -86,5 +88,8 @@ export class Conversor {
     }
 
     this.loading = false;
+
+    // Força a interface atualizar imediatamente
+    this.cdr.detectChanges();
   }
 }
