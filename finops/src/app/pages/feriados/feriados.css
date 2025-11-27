@@ -1,0 +1,116 @@
+.content-section.feriados {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Cabeçalho */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.header h1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.year-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.year-filter label {
+  font-size: 14px;
+  color: #374151;
+}
+
+.year-filter input {
+  width: 120px;
+  padding: 10px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Card */
+.table-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-weight: 600;
+  color: #004AAD;
+}
+
+/* Erro */
+.error {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #B00020;
+  font-weight: 600;
+}
+
+/* Tabela */
+.main-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.main-table th {
+  background: #F1F5F9;
+  padding: 12px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.main-table td {
+  padding: 12px;
+  border-bottom: 1px solid #E5E7EB;
+  font-size: 14px;
+}
+
+/* Tag */
+.tag {
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tag.national {
+  background: #C9F7D4;
+  color: #065F46;
+}
+
+/* No Data */
+.no-data {
+  padding: 16px;
+  text-align: center;
+  color: #6B7280;
+  font-size: 14px;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .year-filter input {
+    width: 100%;
+  }
+}

@@ -6,6 +6,9 @@ import { VerAdiantamento } from './pages/ver-adiantamento/ver-adiantamento';
 import { Perfil } from './pages/perfil/perfil';
 import { Login } from './pages/login/login';
 import { EditarAdiantamento } from './pages/editar-adiantamento/editar-adiantamento';
+import { Aprovacoes } from './pages/aprovacoes/aprovacoes';
+import { Conversor } from './pages/conversor/conversor';
+import { Feriados } from './pages/feriados/feriados';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, // Redireciona raiz para dashboard
@@ -16,4 +19,7 @@ export const routes: Routes = [
     { path: 'perfil', component: Perfil },
     { path: 'login', component: Login },
     { path: 'editar-adiantamento', component: EditarAdiantamento },
+    { path: 'aprovacoes', component: Aprovacoes },
+    { path: 'conversor', component: Conversor },
+    { path: 'feriados', component: Feriados },
 ];

@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-ver-adiantamento',
@@ -11,7 +12,7 @@ import { Router } from '@angular/router';
 })
 export class VerAdiantamento implements OnInit {
    sidebarOpen = false;
-  profileMenuOpen = false;
+   profileMenuOpen = false;
 
   dados = {
     id: 1001,
@@ -22,11 +23,11 @@ export class VerAdiantamento implements OnInit {
     valor: "R$ 850,00",
     moeda: "BRL",
     ptax: "5.12",
-    status: "pendente",
+    status: "Pendente",
     anexos: ["Recibo1.pdf", "NotaHotel.png"]
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private location: Location) {}
 
   ngOnInit(): void {}
 
@@ -50,7 +51,7 @@ export class VerAdiantamento implements OnInit {
     });
   }
 
-  voltar() {
-    this.router.navigate(['/adiantamentos']);
+  voltar(): void {
+    this.location.back();
   }
 }

@@ -90,29 +90,33 @@
     text-transform: capitalize;
 }
 
-.tag.pendente {
+.tag.Pendente {
     background: #FFF2B3;
     color: #9A7B00;
 }
 
-.tag.revisão {
+.tag.Revisão {
     background: #D7E7FF;
     color: #0B4DA3;
 }
 
-.tag.aprovado {
+.tag.Aprovado {
     background: #a8efeb;
     color: #026762;
 }
 
-.tag.pago {
+.tag.Pago {
     background: #BDF0BD;
     color: #066306;
 }
 
-.tag.atrasado {
+.tag.Atrasado {
     background: #fcdee0;
     color: #E63946;
+}
+
+.tag.Rejeitado {
+    border: solid 1px;
 }
 
 /* BOTÃO VER */

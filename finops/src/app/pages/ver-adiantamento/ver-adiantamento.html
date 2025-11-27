@@ -5,12 +5,6 @@
 
     <div class="header-buttons">
         <button class="btn-back" (click)="voltar()">Voltar</button>
-
-        <button class="btn-edit"
-                *ngIf="dados.status === 'pendente' || dados.status === 'revisão'"
-                (click)="editar()">
-            ✏️ Editar
-        </button>
     </div>
 </div>
 

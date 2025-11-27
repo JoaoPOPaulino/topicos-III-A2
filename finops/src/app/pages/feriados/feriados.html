@@ -1,0 +1,41 @@
+<section class="content-section feriados">
+
+  <div class="header">
+    <h1>Feriados Nacionais</h1>
+
+    <div class="year-filter">
+      <label>Ano</label>
+      <input type="number" [(ngModel)]="ano" (change)="buscarFeriados()" min="1900" max="2100" />
+    </div>
+  </div>
+
+  <div class="card table-card">
+
+    <div *ngIf="loading" class="loading">Carregando...</div>
+
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+    <table class="main-table" *ngIf="!loading && holidays.length > 0">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Nome</th>
+          <th>Tipo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of holidays">
+          <td>{{ h.date | date:'dd/MM/yyyy' }}</td>
+          <td>{{ h.name }}</td>
+          <td><span class="tag national">Nacional</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!loading && holidays.length === 0 && !errorMessage" class="no-data">
+      Nenhum feriado encontrado para este ano.
+    </div>
+
+  </div>
+
+</section>

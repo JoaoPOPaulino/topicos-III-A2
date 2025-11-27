@@ -15,8 +15,7 @@
     gap: 10px;
 }
 
-.btn-back,
-.btn-edit {
+.btn-back {
     padding: 10px 18px;
     border-radius: 8px;
     border: none;
@@ -26,7 +25,6 @@
 }
 
 .btn-back { background: #004AAD; }
-.btn-edit { background: #0B7C22; }
 
 /* CARD */
 .card {
@@ -62,11 +60,13 @@
     font-weight: 700;
 }
 
-.tag.pendente { color: #9A7B00;}
-.tag.revisão { color: #0B4DA3;}
-.tag.aprovado {color: #026762;}
-.tag.pago { color: #066306;}
-.tag.atrasado {color: #E63946;}
+.tag.Pendente { color: #9A7B00;}
+.tag.Revisão { color: #0B4DA3;}
+.tag.Aprovado {color: #026762;}
+.tag.Pago { color: #066306;}
+.tag.Atrasado {color: #E63946;}
+.tag.Rejeitado {color: black;}
+
 
 /* ATTACHMENTS */
 .attachments {

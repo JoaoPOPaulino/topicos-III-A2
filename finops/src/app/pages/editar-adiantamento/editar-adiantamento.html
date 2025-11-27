@@ -4,7 +4,7 @@
       <h1 class="page-title">Editar Adiantamento</h1>
 
       <div class="header-buttons">
-        <button class="btn-back" routerLink="/ver-adiantamento">
+        <button class="btn-back"(click)="voltar()">
           Voltar
         </button>
       </div>
@@ -57,6 +57,18 @@
           <option value="hospedagem">Hospedagem</option>
           <option value="material">Material de Escritório</option>
           <option value="outros">Outros</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select formControlName="categoria">
+          <option value="Pendente">Pendente</option>
+          <option value="Revisão">Revisão</option>
+          <option value="Aprovado">Aprovado</option>
+          <option value="Atrasado">Atrasado</option>
+          <option value="Rejeitado">Rejeitado</option>
+          <option value="Pago">Pago</option>
         </select>
       </div>
 

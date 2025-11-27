@@ -1,0 +1,79 @@
+<section class="content-section conversor">
+
+  <div class="header">
+    <h1>Conversor de Moedas</h1>
+  </div>
+
+  <!-- Card principal -->
+  <div class="card converter-box">
+
+    <div class="row">
+      <div class="field">
+        <label>Moeda Origem</label>
+        <select [(ngModel)]="from">
+          <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+
+      <button class="invert" (click)="invertCurrencies()">⇄</button>
+
+      <div class="field">
+        <label>Moeda Destino</label>
+        <select [(ngModel)]="to">
+          <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field full">
+        <label>Valor a converter</label>
+        <input type="number" [(ngModel)]="amount" placeholder="Ex: 100.00" />
+      </div>
+    </div>
+
+    <button class="btn-convert" (click)="convert()" [disabled]="loading">
+      {{ loading ? 'Convertendo...' : 'Converter' }}
+    </button>
+
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="result-card" *ngIf="result">
+      <h3>Resultado</h3>
+      <p><strong>{{ result.amount | number:'1.2-2' }} {{ result.from }}</strong> =</p>
+      <h2>{{ result.converted | number:'1.2-2' }} {{ result.to }}</h2>
+      <p class="rate">Taxa usada: {{ result.rate }} ({{ result.from }} → {{ result.to }})</p>
+      <p class="date">Atualizado em: {{ result.date }}</p>
+    </div>
+
+  </div>
+
+  <!-- Histórico -->
+  <div class="card history-box" *ngIf="history.length > 0">
+    <h2>Histórico de Conversões</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>De</th>
+          <th>Para</th>
+          <th>Valor</th>
+          <th>Convertido</th>
+          <th>Taxa</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of history">
+          <td>{{ h.from }}</td>
+          <td>{{ h.to }}</td>
+          <td>{{ h.amount }}</td>
+          <td>{{ h.converted | number:'1.2-2' }}</td>
+          <td>{{ h.rate }}</td>
+          <td>{{ h.date }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>

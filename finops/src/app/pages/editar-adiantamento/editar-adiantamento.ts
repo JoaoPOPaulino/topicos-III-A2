@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-editar-adiantamento',
@@ -11,6 +12,8 @@ import { RouterModule } from '@angular/router';
   styleUrl: './editar-adiantamento.css',
 })
 export class EditarAdiantamento {
+
+  constructor(private location: Location) {}
 
   private fb = inject(FormBuilder);
 
@@ -24,6 +27,7 @@ export class EditarAdiantamento {
     moeda: ['BRL', Validators.required],
     data: ['', Validators.required],
     categoria: ['transporte', Validators.required],
+    status: ['Pendente', Validators.required],
     anexo: [null]
   });
 
@@ -61,5 +65,9 @@ export class EditarAdiantamento {
 
     console.log('ADIANTAMENTO ATUALIZADO:', this.adiantamentoForm.value);
     alert('Adiantamento salvo com sucesso!');
+  }
+
+  voltar(): void {
+    this.location.back();
   }
 }
