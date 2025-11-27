@@ -3,6 +3,28 @@
     padding: 32px;
 }
 
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-back {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-back { background: #004AAD; }
+
 .form-container {
     background: white;
     padding: 28px;
@@ -52,4 +74,15 @@
 /* MOBILE */
 @media (max-width: 768px) {
     .row { flex-direction: column; }
+
+    .page-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .header-buttons {
+        margin-bottom: 20px;
+    }
 }

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-novo-adiantamento',
@@ -11,7 +12,7 @@ import { RouterModule, Router } from '@angular/router';
   styleUrl: './novo-adiantamento.css',
 })
 export class NovoAdiantamento {
-  constructor(private router: Router) {}
+  constructor(private router: Router, private location: Location) {}
 
   sidebarOpen = false;
   profileMenuOpen = false;
@@ -49,5 +50,9 @@ export class NovoAdiantamento {
   salvar() {
     alert('Adiantamento salvo com sucesso!');
     this.router.navigate(['/adiantamentos']);
+  }
+
+    voltar(): void {
+    this.location.back();
   }
 }

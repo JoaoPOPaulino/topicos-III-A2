@@ -171,4 +171,8 @@
     .filters-box {
         flex-direction: column;
     }
+
+    .page-header {
+        flex-direction: column;
+    }
 }

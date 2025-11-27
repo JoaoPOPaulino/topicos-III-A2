@@ -35,30 +35,28 @@
   font-size: 14px;
 }
 
-/* table card */
-.table-card {
-  background: #fff;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+/* table basic */
+.table-wrapper {
+    margin-top: 24px;
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    overflow-x: auto;
 }
 
-/* table basic */
 .main-table {
   width: 100%;
   border-collapse: collapse;
 }
 .main-table th {
-  text-align: left;
-  padding: 12px;
-  background: #F1F5F9;
-  font-weight: 700;
-  font-size: 14px;
+    padding: 12px;
+    background: #EFF3F8;
+    font-weight: 700;
+    text-align: left;
 }
 .main-table td {
-  padding: 12px;
-  border-bottom: 1px solid #EEF2F6;
-  vertical-align: middle;
+    padding: 12px;
+    border-bottom: 1px solid #E0E6EF;
 }
 .no-data {
   text-align: center;
