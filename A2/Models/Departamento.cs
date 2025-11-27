@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// Models/Departamento.cs
+using System.ComponentModel.DataAnnotations;
 
 namespace A2.Models
 {
@@ -7,12 +8,16 @@ namespace A2.Models
         [Key]
         public int Id { get; set; }
 
-        public int EmpresaId { get; set; }
-        public Empresa? Empresa { get; set; }
-
+        [Required]
         public required string Nome { get; set; }
+
+        [Required]
         public required string CentroDeCusto { get; set; }
 
         public int? GestorId { get; set; }
+
+        public bool Ativo { get; set; } = true;
+
+        public ICollection<Usuario>? Usuarios { get; set; }
     }
 }

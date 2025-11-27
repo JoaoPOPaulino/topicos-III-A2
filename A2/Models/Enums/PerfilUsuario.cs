@@ -2,9 +2,10 @@
 {
     public enum PerfilUsuario
     {
-        Colaborador,
-        Gestor,
-        Financeiro,
-        Administrador
+        Colaborador = 1,
+        RH = 2,           
+        Gestor = 3,        
+        Financeiro = 4,  
+        Administrador = 5 
     }
 }

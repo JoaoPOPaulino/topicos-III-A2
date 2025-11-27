@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// Models/Empresa.cs (simplificada - única empresa)
+using System.ComponentModel.DataAnnotations;
 
 namespace A2.Models
 {
@@ -13,7 +14,12 @@ namespace A2.Models
         [Required]
         public required string Cnpj { get; set; }
 
+        public string? RazaoSocial { get; set; }
+
+        public string? Endereco { get; set; }
+
+        public string? Telefone { get; set; }
+
         public ICollection<Departamento>? Departamentos { get; set; }
-        public ICollection<Usuario>? Usuarios { get; set; }
     }
 }

@@ -1,6 +1,18 @@
+﻿using A2.Data;
+using A2.Services;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Adicionar serviços ao contêiner.
+
+// 1. Configuração do EF Core e DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 2. Registro do Serviço de Adiantamento (ASSUMIMOS QUE VOCÊ JÁ CRIOU AS CLASSES)
+builder.Services.AddScoped<ISolicitacaoAdiantamentoService, SolicitacaoAdiantamentoService>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

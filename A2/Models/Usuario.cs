@@ -8,9 +8,6 @@ namespace A2.Models
         [Key]
         public int Id { get; set; }
 
-        public int EmpresaId { get; set; }
-        public Empresa? Empresa { get; set; }
-
         public int DepartamentoId { get; set; }
         public Departamento? Departamento { get; set; }
 
@@ -21,6 +18,12 @@ namespace A2.Models
         [EmailAddress]
         public required string Email { get; set; }
 
+        public required string Cpf { get; set; }
+
         public PerfilUsuario Perfil { get; set; }
+
+        public bool Ativo { get; set; } = true;
+
+        public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
     }
 }
