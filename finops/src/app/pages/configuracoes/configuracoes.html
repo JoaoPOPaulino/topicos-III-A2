@@ -1,0 +1,79 @@
+<section class="content-section configuracoes">
+
+  <h1>Configurações do Sistema</h1>
+
+  <!-- Aparência -->
+  <div class="card">
+    <h2>Aparência</h2>
+
+    <div class="row">
+      <label>Tema</label>
+      <select [(ngModel)]="settings.theme">
+        <option value="auto">Automático</option>
+        <option value="light">Claro</option>
+        <option value="dark">Escuro</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label>Idioma</label>
+      <select [(ngModel)]="settings.language">
+        <option *ngFor="let lang of languages" [value]="lang">{{ lang }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Moedas e Datas -->
+  <div class="card">
+    <h2>Moedas & Datas</h2>
+
+    <div class="row">
+      <label>Moeda padrão</label>
+      <select [(ngModel)]="settings.defaultCurrency">
+        <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label>Formato de data</label>
+      <select [(ngModel)]="settings.dateFormat">
+        <option *ngFor="let f of dateFormats" [value]="f">{{ f }}</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label>Fuso horário</label>
+      <select [(ngModel)]="settings.timezone">
+        <option *ngFor="let t of timezones" [value]="t">{{ t }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Segurança -->
+  <div class="card">
+    <h2>Segurança</h2>
+
+    <div class="switch-row">
+      <label>Notificações do sistema</label>
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="settings.enableNotifications" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-row">
+      <label>Ativar autenticação em duas etapas</label>
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="settings.enableTwoFactor" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="save-area">
+    <button class="btn-save" (click)="saveSettings()">Salvar Configurações</button>
+    <p class="success" *ngIf="savedMessage">{{ savedMessage }}</p>
+ </div>
+
+
+</section>

@@ -1,3 +1,9 @@
+
+.layout {
+    display: flex;
+}
+
+
 .main {
     margin-left: 260px;
     width: 100%;

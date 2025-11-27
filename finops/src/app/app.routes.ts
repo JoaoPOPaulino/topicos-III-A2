@@ -9,6 +9,7 @@ import { EditarAdiantamento } from './pages/editar-adiantamento/editar-adiantame
 import { Aprovacoes } from './pages/aprovacoes/aprovacoes';
 import { Conversor } from './pages/conversor/conversor';
 import { Feriados } from './pages/feriados/feriados';
+import { Configuracoes } from './pages/configuracoes/configuracoes';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, // Redireciona raiz para dashboard
@@ -22,4 +23,5 @@ export const routes: Routes = [
     { path: 'aprovacoes', component: Aprovacoes },
     { path: 'conversor', component: Conversor },
     { path: 'feriados', component: Feriados },
+    { path: 'configuracoes', component: Configuracoes },
 ];
