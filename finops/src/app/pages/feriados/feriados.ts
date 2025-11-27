@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ChangeDetectorRef } from '@angular/core';
 
 interface Holiday {
   date: string;
@@ -11,42 +13,41 @@ interface Holiday {
 @Component({
   selector: 'app-feriados',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './feriados.html',
-  styleUrl: './feriados.css',
+  styleUrls: ['./feriados.css']
 })
 export class Feriados {
-    ano: number = new Date().getFullYear();
+  ano: number = new Date().getFullYear();
   holidays: Holiday[] = [];
   loading = false;
   errorMessage = '';
 
-  async ngOnInit() {
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+
+  ngOnInit() {
     this.buscarFeriados();
   }
 
-  async buscarFeriados() {
+  buscarFeriados() {
     this.errorMessage = '';
     this.holidays = [];
     this.loading = true;
 
-    try {
-      const url = `https://brasilapi.com.br/api/feriados/v1/${this.ano}`;
-      const response = await fetch(url);
+    const url = `https://brasilapi.com.br/api/feriados/v1/${this.ano}`;
 
-      if (!response.ok) {
-        throw new Error('Erro ao consultar a API.');
+    this.http.get<Holiday[]>(url).subscribe({
+      next: (data) => {
+        this.holidays = data.filter((h) => h.type === 'national');
+        this.loading = false;
+        this.loading = false;
+this.cdr.detectChanges();
+
+      },
+      error: () => {
+        this.errorMessage = 'Não foi possível carregar os feriados. Tente outro ano.';
+        this.loading = false;
       }
-
-      const data: Holiday[] = await response.json();
-
-      // filtrando apenas feriados nacionais
-      this.holidays = data.filter(h => h.type === 'national');
-
-    } catch (err) {
-      this.errorMessage = 'Não foi possível carregar os feriados. Tente outro ano.';
-    }
-
-    this.loading = false;
+    });
   }
 }
