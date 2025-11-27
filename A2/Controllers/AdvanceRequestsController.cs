@@ -10,16 +10,18 @@ namespace A2.Controllers
     public class AdvanceRequestsController : ControllerBase
     {
         private readonly ISolicitacaoAdiantamentoService _service;
-        private readonly ILogger<AdvanceRequestsController> _logger; // Para logs
+        private readonly IExchangeRateService _exchangeRateService;
+        private readonly ILogger<AdvanceRequestsController> _logger;
 
         public AdvanceRequestsController(
             ISolicitacaoAdiantamentoService service,
+            IExchangeRateService exchangeRateService,
             ILogger<AdvanceRequestsController> logger)
         {
             _service = service;
+            _exchangeRateService = exchangeRateService;
             _logger = logger;
         }
-
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -130,6 +132,71 @@ namespace A2.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound($"Solicitação ID {id} não encontrada.");
+            }
+        }
+
+        [HttpGet("TestRate")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> TestExchangeRate(
+            [FromQuery] int moedaBaseId = 1, // BRL
+            [FromQuery] int moedaCotadaId = 2, // USD
+            [FromQuery] string data = "2023-01-01") // Data Antiga para garantir cache/busca
+        {
+            if (!DateTime.TryParse(data, out var dataCambiaria))
+            {
+                return BadRequest("Formato de data inválido.");
+            }
+
+            try
+            {
+                var rate = await _exchangeRateService.GetRateAsync(moedaBaseId, moedaCotadaId, dataCambiaria);
+
+                return Ok(new
+                {
+                    MoedaBaseId = moedaBaseId,
+                    MoedaCotadaId = moedaCotadaId,
+                    DataReferencia = dataCambiaria.ToShortDateString(),
+                    Taxa = rate,
+                    Mensagem = "Cotação obtida com sucesso (pode ser do cache ou da API externa)."
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Inclui falhas de API ou deserialização
+                _logger.LogError(ex, "Erro na API de Câmbio.");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("TestRateSafe")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> TestExchangeRateSafe()
+        {
+            try
+            {
+                // Usar data atual para evitar muitas chamadas à API
+                var hoje = DateTime.Today;
+
+                // Testar com BRL para USD (mais comum)
+                var rate = await _exchangeRateService.GetRateAsync(1, 2, hoje);
+
+                return Ok(new
+                {
+                    MoedaBase = "BRL",
+                    MoedaCotada = "USD",
+                    DataReferencia = hoje.ToShortDateString(),
+                    Taxa = rate,
+                    Observacao = "Taxa obtida (cache/API/fallback)"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao obter taxa de câmbio");
+                return StatusCode(500, new { erro = ex.Message });
             }
         }
     }

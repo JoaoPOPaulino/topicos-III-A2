@@ -19,26 +19,28 @@ namespace A2.Data
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Moeda> Moedas { get; set; }
-        public DbSet<Fornecedor> Fornecedores { get; set; }
         public DbSet<CategoriaDespesa> CategoriasDespesa { get; set; }
 
         // Módulo Adiantamentos
         public DbSet<SolicitacaoAdiantamento> SolicitacoesAdiantamento { get; set; }
-        public DbSet<AprovacaoAdiantamento> AprovacoesAdiantamento { get; set; }
 
         // Módulo Prestação de Contas
         public DbSet<PrestacaoContas> PrestacoesContas { get; set; }
         public DbSet<Despesa> Despesas { get; set; }
         public DbSet<ComprovanteDespesa> ComprovantesDespesa { get; set; }
-        public DbSet<AprovacaoPrestacao> AprovacoesPrestacao { get; set; }
 
         // Módulo Financeiro
         public DbSet<Pagamento> Pagamentos { get; set; }
 
-        // Módulo Auditoria e Integrações
-        public DbSet<LogCotacao> LogsCotacao { get; set; }
-        public DbSet<Feriado> Feriados { get; set; }
+        // Auditoria
         public DbSet<LogAuditoria> LogsAuditoria { get; set; }
+
+        // Cotação
+        public DbSet<LogCotacao> LogsCotacao { get; set; }
+
+        // Feriados
+        public DbSet<Feriado> Feriados { get; set; }
+
 
 
         // ------------------------------------

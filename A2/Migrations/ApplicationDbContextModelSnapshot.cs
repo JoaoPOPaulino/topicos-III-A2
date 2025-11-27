@@ -22,70 +22,6 @@ namespace A2.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("A2.Models.AprovacaoAdiantamento", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Aprovado")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("AprovadorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Comentario")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataAprovacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SolicitacaoAdiantamentoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AprovadorId");
-
-                    b.HasIndex("SolicitacaoAdiantamentoId");
-
-                    b.ToTable("AprovacoesAdiantamento");
-                });
-
-            modelBuilder.Entity("A2.Models.AprovacaoPrestacao", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AprovadorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Comentario")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataAprovacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PrestacaoContasId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AprovadorId");
-
-                    b.HasIndex("PrestacaoContasId");
-
-                    b.ToTable("AprovacoesPrestacao");
-                });
-
             modelBuilder.Entity("A2.Models.CategoriaDespesa", b =>
                 {
                     b.Property<int>("Id")
@@ -368,7 +304,7 @@ namespace A2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Fornecedores");
+                    b.ToTable("Fornecedor");
                 });
 
             modelBuilder.Entity("A2.Models.LogAuditoria", b =>
@@ -719,44 +655,6 @@ namespace A2.Migrations
                             NomeCompleto = "Ana Costa",
                             Perfil = 1
                         });
-                });
-
-            modelBuilder.Entity("A2.Models.AprovacaoAdiantamento", b =>
-                {
-                    b.HasOne("A2.Models.Usuario", "Aprovador")
-                        .WithMany()
-                        .HasForeignKey("AprovadorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("A2.Models.SolicitacaoAdiantamento", "SolicitacaoAdiantamento")
-                        .WithMany()
-                        .HasForeignKey("SolicitacaoAdiantamentoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Aprovador");
-
-                    b.Navigation("SolicitacaoAdiantamento");
-                });
-
-            modelBuilder.Entity("A2.Models.AprovacaoPrestacao", b =>
-                {
-                    b.HasOne("A2.Models.Usuario", "Aprovador")
-                        .WithMany()
-                        .HasForeignKey("AprovadorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("A2.Models.PrestacaoContas", "PrestacaoContas")
-                        .WithMany()
-                        .HasForeignKey("PrestacaoContasId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Aprovador");
-
-                    b.Navigation("PrestacaoContas");
                 });
 
             modelBuilder.Entity("A2.Models.ComprovanteDespesa", b =>
