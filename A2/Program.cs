@@ -8,6 +8,7 @@ using System.Net.Http;
 using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,19 @@ builder.Services.AddMemoryCache();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// 1.2. Configuração CORS (CRÍTICO para integração Angular)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp",
+        policy =>
+        {
+            // Permite requisições do front-end Angular local
+            policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 // ------------------------------------
 // 2. CONFIGURAÇÃO DE POLÍTICA DE RESILIÊNCIA (POLLY)
 // ------------------------------------
@@ -34,13 +48,11 @@ static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         .HandleTransientHttpError()
         // Lida com o erro 429
         .OrResult(msg => msg.StatusCode == HttpStatusCode.TooManyRequests)
-        // Usando a sobrecarga que funciona no seu ambiente (retorno de TimeSpan)
         .WaitAndRetryAsync(
             retryCount: 3,
             sleepDurationProvider: retryAttempt =>
             {
-                // Não temos acesso ao resultado (429) aqui, mas a política já lida com o 429
-                // Vamos usar a sobrecarga mais simples e a política cuidará do Rate Limit
+                // Retentativa exponencial padrão: 2s, 4s, 8s
                 return TimeSpan.FromSeconds(Math.Pow(2, retryAttempt));
             }
         );
@@ -50,15 +62,15 @@ static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
 // 3. REGISTRO DE SERVIÇOS E CLIENTES HTTP
 // ------------------------------------
 
-// Registro principal dos serviços de lógica de negócio
+// Registro principal dos serviços de lógica de negócio (REMOVENDO DUPLICATAS)
 builder.Services.AddScoped<ISolicitacaoAdiantamentoService, SolicitacaoAdiantamentoService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
 builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
+builder.Services.AddScoped<IPrestacaoContasService, PrestacaoContasService>();
 
 // Registra o cliente HTTP para a AwesomeAPI com a política de Polly (simples)
 builder.Services
     .AddHttpClient("AwesomeApiCambiaria")
-    // Usa o AddPolicyHandler com o método que retorna a política de retry
     .AddPolicyHandler(GetRetryPolicy())
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler());
 
@@ -98,6 +110,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+// 5.1. Usar o Middleware CORS
+app.UseCors("AllowAngularApp");
 
 app.UseAuthorization();
 

@@ -350,6 +350,29 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -389,10 +412,133 @@
           }
         }
       }
+    },
+    "/api/ExpenseReports": {
+      "post": {
+        "tags": [
+          "ExpenseReports"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestacaoContasCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestacaoContasCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestacaoContasCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "DespesaCreateDto": {
+        "required": [
+          "categoriaId",
+          "dataDespesa",
+          "descricao",
+          "moedaId",
+          "valor"
+        ],
+        "type": "object",
+        "properties": {
+          "categoriaId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fornecedorId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "moedaId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "descricao": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "dataDespesa": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "valor": {
+            "maximum": 1.7976931348623157E+308,
+            "minimum": 0.01,
+            "type": "number",
+            "format": "double"
+          },
+          "observacoes": {
+            "type": "string",
+            "nullable": true
+          },
+          "arquivosAnexados": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LoginDto": {
         "type": "object",
         "properties": {
@@ -403,6 +549,27 @@
           "senha": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PrestacaoContasCreateDto": {
+        "required": [
+          "despesas",
+          "solicitacaoAdiantamentoId"
+        ],
+        "type": "object",
+        "properties": {
+          "solicitacaoAdiantamentoId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "despesas": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DespesaCreateDto"
+            }
           }
         },
         "additionalProperties": false
@@ -490,6 +657,9 @@
     },
     {
       "name": "Data"
+    },
+    {
+      "name": "ExpenseReports"
     }
   ]
 }
