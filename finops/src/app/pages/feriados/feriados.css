@@ -1,116 +1,334 @@
 .content-section.feriados {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #F7F9FB;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', sans-serif;
 }
 
-/* Cabeçalho */
+/* Header */
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 32px;
   flex-wrap: wrap;
 }
 
-.header h1 {
-  font-size: 24px;
-  font-weight: 700;
+.header-content {
+  flex: 1;
+  min-width: 250px;
 }
 
+.icon-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.calendar-icon {
+  width: 32px;
+  height: 32px;
+  color: #004AAD;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1E1E1E;
+  margin: 0;
+}
+
+.subtitle {
+  color: #6B7280;
+  font-size: 14px;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Year Filter */
 .year-filter {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .year-filter label {
   font-size: 14px;
-  color: #374151;
+  color: #1E1E1E;
+  font-weight: 600;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 8px;
 }
 
 .year-filter input {
-  width: 120px;
-  padding: 10px;
-  border: 1px solid #D1D5DB;
-  border-radius: 8px;
-  font-size: 14px;
+  min-width: 120px;
+  padding: 12px 16px;
+  border: 1px solid #E5E7EB;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1E1E1E;
+  outline: none;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
 }
 
-/* Card */
-.table-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+.year-filter input:focus {
+  border-color: #004AAD;
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.1);
+}
+
+.search-btn {
+  background: #004AAD;
+  border: none;
+  border-radius: 15px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-btn:hover {
+  background: #003A8D;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 74, 173, 0.2);
+}
+
+.search-btn:active {
+  transform: translateY(0);
+}
+
+.search-btn svg {
+  width: 20px;
+  height: 20px;
+  color: #fff;
 }
 
 /* Loading */
-.loading {
-  text-align: center;
-  padding: 20px;
-  font-weight: 600;
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 20px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #E5E7EB;
+  border-top-color: #004AAD;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-container p {
   color: #004AAD;
-}
-
-/* Erro */
-.error {
-  text-align: center;
-  margin-bottom: 10px;
-  color: #B00020;
   font-weight: 600;
+  font-size: 16px;
+  margin: 0;
 }
 
-/* Tabela */
-.main-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Error */
+.error-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #fff;
+  border-left: 4px solid #E63946;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(230, 57, 70, 0.1);
 }
 
-.main-table th {
-  background: #F1F5F9;
-  padding: 12px;
-  text-align: left;
+.error-container svg {
+  width: 24px;
+  height: 24px;
+  color: #E63946;
+  flex-shrink: 0;
+}
+
+.error-container p {
+  color: #E63946;
+  font-weight: 600;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Holidays Grid */
+.holidays-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Holiday Card */
+.holiday-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid #E5E7EB;
+}
+
+.holiday-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #004AAD;
+}
+
+.card-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #004AAD;
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 70px;
+}
+
+.day {
+  font-size: 28px;
   font-weight: 700;
-  font-size: 14px;
+  color: #fff;
+  line-height: 1;
 }
 
-.main-table td {
-  padding: 12px;
-  border-bottom: 1px solid #E5E7EB;
-  font-size: 14px;
-}
-
-/* Tag */
-.tag {
-  padding: 6px 10px;
-  border-radius: 16px;
-  font-size: 13px;
+.month {
+  font-size: 12px;
   font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  margin-top: 4px;
+  letter-spacing: 0.5px;
 }
 
-.tag.national {
-  background: #C9F7D4;
-  color: #065F46;
+.card-content {
+  flex: 1;
+}
+
+.holiday-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+
+.holiday-weekday {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0;
+  text-transform: capitalize;
+  font-weight: 500;
 }
 
 /* No Data */
-.no-data {
-  padding: 16px;
-  text-align: center;
-  color: #6B7280;
-  font-size: 14px;
+.no-data-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 20px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Responsividade */
-@media (max-width: 600px) {
+.no-data-container svg {
+  width: 56px;
+  height: 56px;
+  color: #9CA3AF;
+}
+
+.no-data-container p {
+  color: #6B7280;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-section.feriados {
+    padding: 24px 16px;
+  }
+
   .header {
     flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    gap: 20px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .holidays-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .year-filter {
+    width: 100%;
+  }
+
+  .input-wrapper {
+    width: 100%;
   }
 
   .year-filter input {
-    width: 100%;
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .holiday-card {
+    padding: 16px;
+  }
+
+  .card-date {
+    min-width: 60px;
+    padding: 10px 12px;
+  }
+
+  .day {
+    font-size: 24px;
+  }
+
+  .holiday-name {
+    font-size: 15px;
   }
 }

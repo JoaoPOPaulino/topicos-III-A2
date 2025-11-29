@@ -1,41 +1,68 @@
 <section class="content-section feriados">
-
+  
   <div class="header">
-    <h1>Feriados Nacionais</h1>
+    <div class="header-content">
+      <div class="icon-title">
+        <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <h1>Feriados Nacionais</h1>
+      </div>
+      <p class="subtitle">Consulte os feriados nacionais brasileiros</p>
+    </div>
 
     <div class="year-filter">
       <label>Ano</label>
-      <input type="number" [(ngModel)]="ano" (change)="buscarFeriados()" min="1900" max="2100" />
+      <div class="input-wrapper">
+        <input type="number" [(ngModel)]="ano" (change)="buscarFeriados()" min="1900" max="2100" />
+        <button class="search-btn" (click)="buscarFeriados()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="card table-card">
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando feriados...</p>
+  </div>
 
-    <div *ngIf="loading" class="loading">Carregando...</div>
+  <div *ngIf="errorMessage" class="error-container">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <p>{{ errorMessage }}</p>
+  </div>
 
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-
-    <table class="main-table" *ngIf="!loading && holidays.length > 0">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Nome</th>
-          <th>Tipo</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let h of holidays">
-          <td>{{ h.date | date:'dd/MM/yyyy' }}</td>
-          <td>{{ h.name }}</td>
-          <td><span class="tag national">Nacional</span></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div *ngIf="!loading && holidays.length === 0 && !errorMessage" class="no-data">
-      Nenhum feriado encontrado para este ano.
+  <div class="holidays-grid" *ngIf="!loading && holidays.length > 0">
+    <div class="holiday-card" *ngFor="let h of holidays">
+      <div class="card-date">
+        <div class="day">{{ getDay(h.date) }}</div>
+        <div class="month">{{ getMonthName(h.date) }}</div>
+      </div>
+      <div class="card-content">
+        <h3 class="holiday-name">{{ h.name }}</h3>
+        <p class="holiday-weekday">{{ getDayOfWeek(h.date) }}</p>
+      </div>
     </div>
+  </div>
 
+  <div *ngIf="!loading && holidays.length === 0 && !errorMessage" class="no-data-container">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg>
+    <p>Nenhum feriado encontrado para {{ ano }}</p>
   </div>
 
 </section>
