@@ -1,69 +1,159 @@
-<section class="content-section aprovacoes">
+<section class="content">
 
   <div class="page-header">
-    <h1>Aprovações</h1>
-
-    <div class="page-actions">
-      <input type="text" placeholder="Buscar por solicitante, descrição, valor..." [(ngModel)]="search" (ngModelChange)="applyFilters()" />
-      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
-        <option value="">Todos</option>
-        <option value="Pendente">Pendente</option>
-        <option value="Revisão">Revisão</option>
-        <option value="Aprovado">Aprovado</option>
-        <option value="Atrasado">Atrasado</option>
-        <option value="Rejeitado">Rejeitado</option>
-        <option value="Pago">Pago</option>
-      </select>
-      <input type="date" [(ngModel)]="dateFrom" (change)="applyFilters()" />
-      <input type="date" [(ngModel)]="dateTo" (change)="applyFilters()" />
+    <div class="header-content">
+      <div class="icon-title">
+        <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"></path>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        <h1 class="page-title">Aprovações</h1>
+      </div>
+      <p class="subtitle">Gerencie e aprove solicitações de adiantamento</p>
     </div>
   </div>
 
-  <!-- table card -->
-  <div class="table-wrapper">
-    <table class="main-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Solicitante</th>
-          <th>Descrição</th>
-          <th>Valor</th>
-          <th>Moeda</th>
-          <th>Data</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
+  <!-- FILTERS -->
+  <div class="filters-card">
+    <div class="filters-header">
+      <div class="filters-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        <span>Filtros</span>
+      </div>
+      <button class="btn-clear-filters" (click)="limparFiltros()" *ngIf="search || statusFilter || dateFrom || dateTo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Limpar
+      </button>
+    </div>
 
-      <tbody>
-        <tr *ngFor="let item of pageItems">
-          <td>{{ item.id }}</td>
-          <td>{{ item.requester }}</td>
-          <td>{{ item.description }}</td>
-          <td>{{ formatMoney(item.amount, item.currency) }}</td>
-          <td>{{ item.currency }}</td>
-          <td>{{ item.date | date:'dd/MM/yyyy' }}</td>
-          <td><span class="tag" [ngClass]="statusClass(item.status)">{{ item.status }}</span></td>
-          <td class="actions">
-            <button class="btn-view" (click)="verAdiantamento()">Ver</button>
-            <button *ngIf="item.status === 'Pendente' || item.status === 'Revisão' || item.status === 'Atrasado'"
-                    class="btn-edit"
-                    (click)="goToEdit()">Editar</button>
-          </td>
-        </tr>
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Buscar</label>
+        <div class="input-with-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="text" [(ngModel)]="search" (ngModelChange)="applyFilters()" placeholder="Buscar por solicitante, descrição, valor...">
+        </div>
+      </div>
 
-        <tr *ngIf="pageItems.length === 0">
-          <td colspan="8" class="no-data">Nenhum registro encontrado.</td>
-        </tr>
-      </tbody>
-    </table>
+      <div class="filter-group">
+        <label>Status</label>
+        <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Revisão">Revisão</option>
+          <option value="Aprovado">Aprovado</option>
+          <option value="Pago">Pago</option>
+          <option value="Atrasado">Atrasado</option>
+          <option value="Rejeitado">Rejeitado</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Data Inicial</label>
+        <input type="date" [(ngModel)]="dateFrom" (change)="applyFilters()">
+      </div>
+
+      <div class="filter-group">
+        <label>Data Final</label>
+        <input type="date" [(ngModel)]="dateTo" (change)="applyFilters()">
+      </div>
+    </div>
   </div>
 
-  <!-- pagination control (format <--- 1 --->
-  <div class="pagination">
-    <button class="arrow" (click)="prevPage()" [disabled]="currentPage === 1">&lt;</button>
-    <div class="page-number">{{ currentPage }}</div>
-    <button class="arrow" (click)="nextPage()" [disabled]="currentPage === totalPages">&gt;</button>
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table class="main-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Solicitante</th>
+            <th>Descrição</th>
+            <th>Valor</th>
+            <th>Moeda</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of pageItems">
+            <td class="id-cell">#{{ item.id }}</td>
+            <td class="name-cell">{{ item.requester }}</td>
+            <td>{{ item.description }}</td>
+            <td class="value-cell">{{ formatMoney(item.amount, item.currency) }}</td>
+            <td>
+              <span class="currency-badge">{{ item.currency }}</span>
+            </td>
+            <td class="date-cell">{{ item.date | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span class="tag" [ngClass]="statusClass(item.status)">{{ item.status }}</span>
+            </td>
+            <td class="actions">
+              <button class="btn-view" (click)="verAdiantamento()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                Ver
+              </button>
+              <button *ngIf="item.status === 'Pendente' || item.status === 'Revisão' || item.status === 'Atrasado'"
+                      class="btn-edit"
+                      (click)="goToEdit()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Editar
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="pageItems.length === 0">
+            <td colspan="8" class="no-data">
+              <div class="no-data-content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p>Nenhum registro encontrado</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="pagination-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="pagination-info">
+        <span class="current-page">{{ currentPage }}</span>
+        <span class="separator">/</span>
+        <span class="total-pages">{{ totalPages }}</span>
+      </div>
+
+      <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
   </div>
 
 </section>

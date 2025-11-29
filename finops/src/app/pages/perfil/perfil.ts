@@ -17,26 +17,28 @@ type CamposSenha = {
   styleUrl: './perfil.css',
 })
 export class Perfil {
- 
   sidebarOpen = false;
   profileMenuOpen = false;
+  showSuccessAlert = false;
+  successMessage = '';
 
   user = {
     nome: 'Lucas Henderson',
     email: 'lucas@empresa.com',
     role: 'Analista de Sistemas',
-    department: 'TI'
+    department: 'TI',
+    telefone: '+55 (63) 99999-9999',
+    dataEntrada: '2023-01-15',
   };
 
   senhaAtual = '';
   novaSenha = '';
   confirmarSenha = '';
 
-  // AGORA SEM TS4111
   camposVisiveis: CamposSenha = {
     senhaAtual: false,
     novaSenha: false,
-    confirmarSenha: false
+    confirmarSenha: false,
   };
 
   constructor(private router: Router) {}
@@ -62,20 +64,48 @@ export class Perfil {
   salvar() {
     if (this.senhaAtual || this.novaSenha || this.confirmarSenha) {
       if (!this.senhaAtual) {
-        alert('Informe a senha atual.');
+        this.showError('Informe a senha atual.');
         return;
       }
-      if (this.novaSenha.length < 4) {
-        alert('A nova senha deve ter ao menos 4 caracteres.');
+      if (this.novaSenha.length < 6) {
+        this.showError('A nova senha deve ter ao menos 6 caracteres.');
         return;
       }
       if (this.novaSenha !== this.confirmarSenha) {
-        alert('A nova senha e a confirmação não coincidem.');
+        this.showError('A nova senha e a confirmação não coincidem.');
         return;
       }
-      alert('Senha alterada com sucesso (simulado).');
+      this.showSuccess('Senha alterada com sucesso!');
+      this.limparCamposSenha();
+    } else {
+      this.showSuccess('Dados do perfil atualizados com sucesso!');
     }
+  }
 
-    alert('Dados do perfil atualizados (simulado).');
+  limparCamposSenha() {
+    this.senhaAtual = '';
+    this.novaSenha = '';
+    this.confirmarSenha = '';
+  }
+
+  showSuccess(message: string) {
+    this.successMessage = message;
+    this.showSuccessAlert = true;
+    setTimeout(() => {
+      this.showSuccessAlert = false;
+    }, 3000);
+  }
+
+  showError(message: string) {
+    alert(message);
+  }
+
+  getInitials(): string {
+    if (!this.user.nome) return 'U';
+    const names = this.user.nome.split(' ');
+    if (names.length >= 2) {
+      return names[0].charAt(0) + names[names.length - 1].charAt(0);
+    }
+    return this.user.nome.charAt(0);
   }
 }

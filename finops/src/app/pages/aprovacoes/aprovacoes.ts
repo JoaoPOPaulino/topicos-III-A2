@@ -9,7 +9,7 @@ interface Approval {
   description: string;
   amount: number;
   currency: string;
-  date: string; // ISO yyyy-mm-dd
+  date: string;
   status: 'Pendente' | 'Revisão' | 'Aprovado' | 'Rejeitado' | 'Pago' | 'Atrasado';
 }
 
@@ -21,39 +21,195 @@ interface Approval {
   styleUrl: './aprovacoes.css',
 })
 export class Aprovacoes implements OnInit {
-  
-  // filtros
   search = '';
   statusFilter = '';
   dateFrom = '';
   dateTo = '';
 
-  // paginação
   currentPage = 1;
   itemsPerPage = 10;
 
-  // dados mock (substituir por chamada HTTP ao backend)
   allApprovals: Approval[] = [
-    { id: 2001, requester: 'Lucas Henderson', description: 'Reembolso viagem SP', amount: 220.00, currency: 'BRL', date: '2025-02-02', status: 'Pendente' },
-    { id: 2002, requester: 'Ana Costa', description: 'Jantar reunião', amount: 80.00, currency: 'USD', date: '2025-01-31', status: 'Revisão' },
-    { id: 2003, requester: 'Carlos Silva', description: 'Material escritório', amount: 130.00, currency: 'BRL', date: '2025-02-01', status: 'Aprovado' },
-    { id: 2004, requester: 'Beatriz Lima', description: 'Translado aeroporto', amount: 40.00, currency: 'EUR', date: '2025-01-29', status: 'Rejeitado' },
-    { id: 2005, requester: 'Mariana Torres', description: 'Hotel SP', amount: 210.00, currency: 'EUR', date: '2025-01-28', status: 'Pago' },
-    { id: 2006, requester: 'João Paulo', description: 'Taxi', amount: 45.00, currency: 'BRL', date: '2025-02-04', status: 'Atrasado' },
-    { id: 2007, requester: 'Eduardo Melo', description: 'Reunião SP', amount: 120.00, currency: 'EUR', date: '2025-02-01', status: 'Aprovado' },
-    { id: 2008, requester: 'Bianca Souza', description: 'Uber', amount: 40.00, currency: 'BRL', date: '2025-02-03', status: 'Revisão' },
-    { id: 2009, requester: 'Ricardo Lima', description: 'Hospedagem', amount: 200.00, currency: 'USD', date: '2025-01-24', status: 'Pago' },
-    { id: 2010, requester: 'Juliana Prado', description: 'Material Escritório', amount: 95.00, currency: 'BRL', date: '2025-02-05', status: 'Pendente' },
-    { id: 2011, requester: 'Ana Souza', description: 'Passagem Aérea', amount: 540.00, currency: 'USD', date: '2025-02-05', status: 'Aprovado' },
-    { id: 2012, requester: 'Thiago Ramos', description: 'Combustível', amount: 200.00, currency: 'BRL', date: '2025-02-02', status: 'Revisão' },
-    { id: 2013, requester: 'Cristina Alves', description: 'Hospedagem', amount: 310.00, currency: 'BRL', date: '2025-01-29', status: 'Pago' },
-    { id: 2014, requester: 'Diego Santos', description: 'Almoço equipe', amount: 180.00, currency: 'BRL', date: '2025-02-04', status: 'Pendente' },
-    { id: 2015, requester: 'Larissa Fonseca', description: 'Transporte', amount: 64.00, currency: 'USD', date: '2025-02-03', status: 'Aprovado' },
-    { id: 2016, requester: 'Renato Silva', description: 'Alimentação', amount: 48.00, currency: 'EUR', date: '2025-02-05', status: 'Revisão' },
-    { id: 2017, requester: 'Marcos Tavares', description: 'Uber', amount: 32.00, currency: 'BRL', date: '2025-02-05', status: 'Pendente' },
-    { id: 2018, requester: 'Alice Martins', description: 'Passagem', amount: 233.00, currency: 'USD', date: '2025-02-02', status: 'Pago' },
-    { id: 2019, requester: 'Felipe Rocha', description: 'Taxi', amount: 22.00, currency: 'BRL', date: '2025-02-04', status: 'Pendente' },
-    { id: 2020, requester: 'Heloísa Cruz', description: 'Hotel', amount: 135.00, currency: 'EUR', date: '2025-01-28', status: 'Aprovado' },
+    {
+      id: 2001,
+      requester: 'Lucas Henderson',
+      description: 'Reembolso viagem SP',
+      amount: 220.0,
+      currency: 'BRL',
+      date: '2025-02-02',
+      status: 'Pendente',
+    },
+    {
+      id: 2002,
+      requester: 'Ana Costa',
+      description: 'Jantar reunião',
+      amount: 80.0,
+      currency: 'USD',
+      date: '2025-01-31',
+      status: 'Revisão',
+    },
+    {
+      id: 2003,
+      requester: 'Carlos Silva',
+      description: 'Material escritório',
+      amount: 130.0,
+      currency: 'BRL',
+      date: '2025-02-01',
+      status: 'Aprovado',
+    },
+    {
+      id: 2004,
+      requester: 'Beatriz Lima',
+      description: 'Translado aeroporto',
+      amount: 40.0,
+      currency: 'EUR',
+      date: '2025-01-29',
+      status: 'Rejeitado',
+    },
+    {
+      id: 2005,
+      requester: 'Mariana Torres',
+      description: 'Hotel SP',
+      amount: 210.0,
+      currency: 'EUR',
+      date: '2025-01-28',
+      status: 'Pago',
+    },
+    {
+      id: 2006,
+      requester: 'João Paulo',
+      description: 'Taxi',
+      amount: 45.0,
+      currency: 'BRL',
+      date: '2025-02-04',
+      status: 'Atrasado',
+    },
+    {
+      id: 2007,
+      requester: 'Eduardo Melo',
+      description: 'Reunião SP',
+      amount: 120.0,
+      currency: 'EUR',
+      date: '2025-02-01',
+      status: 'Aprovado',
+    },
+    {
+      id: 2008,
+      requester: 'Bianca Souza',
+      description: 'Uber',
+      amount: 40.0,
+      currency: 'BRL',
+      date: '2025-02-03',
+      status: 'Revisão',
+    },
+    {
+      id: 2009,
+      requester: 'Ricardo Lima',
+      description: 'Hospedagem',
+      amount: 200.0,
+      currency: 'USD',
+      date: '2025-01-24',
+      status: 'Pago',
+    },
+    {
+      id: 2010,
+      requester: 'Juliana Prado',
+      description: 'Material Escritório',
+      amount: 95.0,
+      currency: 'BRL',
+      date: '2025-02-05',
+      status: 'Pendente',
+    },
+    {
+      id: 2011,
+      requester: 'Ana Souza',
+      description: 'Passagem Aérea',
+      amount: 540.0,
+      currency: 'USD',
+      date: '2025-02-05',
+      status: 'Aprovado',
+    },
+    {
+      id: 2012,
+      requester: 'Thiago Ramos',
+      description: 'Combustível',
+      amount: 200.0,
+      currency: 'BRL',
+      date: '2025-02-02',
+      status: 'Revisão',
+    },
+    {
+      id: 2013,
+      requester: 'Cristina Alves',
+      description: 'Hospedagem',
+      amount: 310.0,
+      currency: 'BRL',
+      date: '2025-01-29',
+      status: 'Pago',
+    },
+    {
+      id: 2014,
+      requester: 'Diego Santos',
+      description: 'Almoço equipe',
+      amount: 180.0,
+      currency: 'BRL',
+      date: '2025-02-04',
+      status: 'Pendente',
+    },
+    {
+      id: 2015,
+      requester: 'Larissa Fonseca',
+      description: 'Transporte',
+      amount: 64.0,
+      currency: 'USD',
+      date: '2025-02-03',
+      status: 'Aprovado',
+    },
+    {
+      id: 2016,
+      requester: 'Renato Silva',
+      description: 'Alimentação',
+      amount: 48.0,
+      currency: 'EUR',
+      date: '2025-02-05',
+      status: 'Revisão',
+    },
+    {
+      id: 2017,
+      requester: 'Marcos Tavares',
+      description: 'Uber',
+      amount: 32.0,
+      currency: 'BRL',
+      date: '2025-02-05',
+      status: 'Pendente',
+    },
+    {
+      id: 2018,
+      requester: 'Alice Martins',
+      description: 'Passagem',
+      amount: 233.0,
+      currency: 'USD',
+      date: '2025-02-02',
+      status: 'Pago',
+    },
+    {
+      id: 2019,
+      requester: 'Felipe Rocha',
+      description: 'Taxi',
+      amount: 22.0,
+      currency: 'BRL',
+      date: '2025-02-04',
+      status: 'Pendente',
+    },
+    {
+      id: 2020,
+      requester: 'Heloísa Cruz',
+      description: 'Hotel',
+      amount: 135.0,
+      currency: 'EUR',
+      date: '2025-01-28',
+      status: 'Aprovado',
+    },
   ];
 
   filteredApprovals: Approval[] = [];
@@ -70,32 +226,26 @@ export class Aprovacoes implements OnInit {
     const from = this.dateFrom ? new Date(this.dateFrom) : null;
     const to = this.dateTo ? new Date(this.dateTo) : null;
 
-    this.filteredApprovals = this.allApprovals.filter(a => {
-      // busca textual
+    this.filteredApprovals = this.allApprovals.filter((a) => {
       const text = `${a.requester} ${a.description} ${a.amount} ${a.currency}`.toLowerCase();
       if (s && !text.includes(s)) return false;
 
-      // status
       if (sf && a.status !== sf) return false;
 
-      // datas
       const ad = new Date(a.date);
       if (from && ad < from) return false;
       if (to) {
-        // include same day
         const toEnd = new Date(to);
-        toEnd.setHours(23,59,59,999);
+        toEnd.setHours(23, 59, 59, 999);
         if (ad > toEnd) return false;
       }
 
       return true;
     });
 
-    // reset page
     this.currentPage = 1;
   }
 
-  // tabela paginada
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.filteredApprovals.length / this.itemsPerPage));
   }
@@ -117,22 +267,28 @@ export class Aprovacoes implements OnInit {
     }
   }
 
-  verAdiantamento() {
+  limparFiltros(): void {
+    this.search = '';
+    this.statusFilter = '';
+    this.dateFrom = '';
+    this.dateTo = '';
+    this.applyFilters();
+  }
+
+  verAdiantamento(): void {
     this.router.navigate(['/ver-adiantamento']);
   }
 
-  goToEdit() {
+  goToEdit(): void {
     this.router.navigate(['/editar-adiantamento']);
   }
 
-  // helper: formata valor
   formatMoney(v: number, currency = 'BRL'): string {
     const locale = 'pt-BR';
     const cur = currency || 'BRL';
     return new Intl.NumberFormat(locale, { style: 'currency', currency: cur }).format(v);
   }
 
-  // helper to return CSS class from status
   statusClass(status: Approval['status']): string {
     return status ? status.replace(/\s+/g, '') : '';
   }

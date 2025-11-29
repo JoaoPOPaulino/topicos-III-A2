@@ -1,79 +1,154 @@
-<section class="content-section configuracoes">
+<section class="content">
 
-  <h1>Configurações do Sistema</h1>
-
-  <!-- Aparência -->
-  <div class="card">
-    <h2>Aparência</h2>
-
-    <div class="row">
-      <label>Tema</label>
-      <select [(ngModel)]="settings.theme">
-        <option value="auto">Automático</option>
-        <option value="light">Claro</option>
-        <option value="dark">Escuro</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <label>Idioma</label>
-      <select [(ngModel)]="settings.language">
-        <option *ngFor="let lang of languages" [value]="lang">{{ lang }}</option>
-      </select>
+  <div class="page-header">
+    <div class="header-content">
+      <div class="icon-title">
+        <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 1v6m0 6v6m5.657-13.657l-4.243 4.243m0 6l-4.243 4.243m13.314-7.243l-6-0m-6 0l-6 0m13.657 5.657l-4.243-4.243m0-6l-4.243-4.243"></path>
+        </svg>
+        <h1 class="page-title">Configurações do Sistema</h1>
+      </div>
+      <p class="subtitle">Personalize as preferências e configurações da plataforma</p>
     </div>
   </div>
 
-  <!-- Moedas e Datas -->
-  <div class="card">
-    <h2>Moedas & Datas</h2>
-
-    <div class="row">
-      <label>Moeda padrão</label>
-      <select [(ngModel)]="settings.defaultCurrency">
-        <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <label>Formato de data</label>
-      <select [(ngModel)]="settings.dateFormat">
-        <option *ngFor="let f of dateFormats" [value]="f">{{ f }}</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <label>Fuso horário</label>
-      <select [(ngModel)]="settings.timezone">
-        <option *ngFor="let t of timezones" [value]="t">{{ t }}</option>
-      </select>
-    </div>
+  <!-- Success Alert -->
+  <div class="success-alert" *ngIf="showSuccessAlert">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span>{{ savedMessage }}</span>
   </div>
 
-  <!-- Segurança -->
-  <div class="card">
-    <h2>Segurança</h2>
+  <div class="settings-grid">
+    
+    <!-- Aparência -->
+    <div class="settings-card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <h2>Aparência</h2>
+      </div>
 
-    <div class="switch-row">
-      <label>Notificações do sistema</label>
-      <label class="switch">
-        <input type="checkbox" [(ngModel)]="settings.enableNotifications" />
-        <span class="slider"></span>
-      </label>
+      <div class="card-content">
+        <div class="form-group">
+          <label>Tema</label>
+          <select [(ngModel)]="settings.theme">
+            <option value="auto">Automático</option>
+            <option value="light">Claro</option>
+            <option value="dark">Escuro</option>
+          </select>
+          <span class="helper-text">O tema será ajustado automaticamente conforme o sistema</span>
+        </div>
+
+        <div class="form-group">
+          <label>Idioma</label>
+          <select [(ngModel)]="settings.language">
+            <option *ngFor="let lang of languages" [value]="lang.value">{{ lang.label }}</option>
+          </select>
+          <span class="helper-text">Idioma da interface do sistema</span>
+        </div>
+      </div>
     </div>
 
-    <div class="switch-row">
-      <label>Ativar autenticação em duas etapas</label>
-      <label class="switch">
-        <input type="checkbox" [(ngModel)]="settings.enableTwoFactor" />
-        <span class="slider"></span>
-      </label>
+    <!-- Moedas e Datas -->
+    <div class="settings-card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+        <h2>Moedas & Datas</h2>
+      </div>
+
+      <div class="card-content">
+        <div class="form-group">
+          <label>Moeda padrão</label>
+          <select [(ngModel)]="settings.defaultCurrency">
+            <option *ngFor="let c of currencies" [value]="c.value">{{ c.label }}</option>
+          </select>
+          <span class="helper-text">Moeda utilizada por padrão em transações</span>
+        </div>
+
+        <div class="form-group">
+          <label>Formato de data</label>
+          <select [(ngModel)]="settings.dateFormat">
+            <option *ngFor="let f of dateFormats" [value]="f.value">{{ f.label }}</option>
+          </select>
+          <span class="helper-text">Como as datas serão exibidas no sistema</span>
+        </div>
+
+        <div class="form-group">
+          <label>Fuso horário</label>
+          <select [(ngModel)]="settings.timezone">
+            <option *ngFor="let t of timezones" [value]="t.value">{{ t.label }}</option>
+          </select>
+          <span class="helper-text">Fuso horário para agendamentos e relatórios</span>
+        </div>
+      </div>
     </div>
+
+    <!-- Segurança -->
+    <div class="settings-card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <h2>Segurança & Notificações</h2>
+      </div>
+
+      <div class="card-content">
+        <div class="toggle-group">
+          <div class="toggle-content">
+            <div class="toggle-info">
+              <label>Notificações do sistema</label>
+              <span class="helper-text">Receba alertas sobre atividades importantes</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="settings.enableNotifications" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="toggle-group">
+          <div class="toggle-content">
+            <div class="toggle-info">
+              <label>Autenticação em duas etapas</label>
+              <span class="helper-text">Adicione uma camada extra de segurança à sua conta</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="settings.enableTwoFactor" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
+  <!-- Save Button -->
   <div class="save-area">
-    <button class="btn-save" (click)="saveSettings()">Salvar Configurações</button>
-    <p class="success" *ngIf="savedMessage">{{ savedMessage }}</p>
- </div>
-
+    <button class="btn-save" (click)="saveSettings()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+      Salvar Configurações
+    </button>
+  </div>
 
 </section>

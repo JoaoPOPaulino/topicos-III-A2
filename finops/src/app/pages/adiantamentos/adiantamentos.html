@@ -1,100 +1,144 @@
 <section class="content">
 
-<div class="page-header">
-    <h1 class="page-title">Adiantamentos</h1>
-    <button class="btn-primary" (click)="novoAdiantamento()">+ Novo Adiantamento</button>
-</div>
+  <div class="page-header">
+    <div class="header-content">
+      <div class="icon-title">
+        <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <h1 class="page-title">Adiantamentos</h1>
+      </div>
+      <p class="subtitle">Gerencie solicitações de adiantamento</p>
+    </div>
+    <button class="btn-primary" (click)="novoAdiantamento()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Novo Adiantamento
+    </button>
+  </div>
 
-<!-- FILTERS -->
-<div class="filters-box">
-
-    <div class="filter-group">
-        <label>Buscar</label>
-        <input type="text" [(ngModel)]="search" (input)="filtrar()"
-                placeholder="Buscar por solicitante, valor, status...">
+  <!-- FILTERS -->
+  <div class="filters-card">
+    <div class="filters-header">
+      <div class="filters-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        <span>Filtros</span>
+      </div>
+      <button class="btn-clear-filters" (click)="limparFiltros()" *ngIf="search || status || dataInicial || dataFinal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Limpar
+      </button>
     </div>
 
-    <div class="filter-group">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Buscar</label>
+        <div class="input-with-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="text" [(ngModel)]="search" (input)="filtrar()" placeholder="Buscar por solicitante, valor, status...">
+        </div>
+      </div>
+
+      <div class="filter-group">
         <label>Status</label>
         <select [(ngModel)]="status" (change)="filtrar()">
-            <option value="">Todos</option>
-            <option value="pendente">Pendente</option>
-            <option value="revisão">Revisão</option>
-            <option value="aprovado">Aprovado</option>
-            <option value="pago">Pago</option>
+          <option value="">Todos</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Revisão">Revisão</option>
+          <option value="Aprovado">Aprovado</option>
+          <option value="Pago">Pago</option>
+          <option value="Atrasado">Atrasado</option>
+          <option value="Rejeitado">Rejeitado</option>
         </select>
-    </div>
+      </div>
 
-    <div class="filter-group">
+      <div class="filter-group">
         <label>Data Inicial</label>
         <input type="date" [(ngModel)]="dataInicial" (change)="filtrar()">
-    </div>
+      </div>
 
-    <div class="filter-group">
+      <div class="filter-group">
         <label>Data Final</label>
         <input type="date" [(ngModel)]="dataFinal" (change)="filtrar()">
+      </div>
     </div>
-</div>
+  </div>
 
-
-<!-- TABLE -->
-<div class="table-wrapper">
-    <table class="main-table">
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table class="main-table">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Solicitante</th>
-                <th>Descrição</th>
-                <th>Valor</th>
-                <th>Moeda</th>
-                <th>Data</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
+          <tr>
+            <th>ID</th>
+            <th>Solicitante</th>
+            <th>Descrição</th>
+            <th>Valor</th>
+            <th>Moeda</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
         </thead>
 
         <tbody>
-            <tr *ngFor="let item of paginaAtualizada">
-                <td>{{ item.id }}</td>
-                <td>{{ item.nome }}</td>
-                <td>{{ item.desc }}</td>
-                <td>{{ item.valor }}</td>
-                <td>{{ item.moeda }}</td>
-                <td>{{ item.data | date:'dd/MM/yyyy' }}</td>
-
-                <td>
-                    <span class="tag {{ item.status }}">{{ item.status }}</span>
-                </td>
-
-                <td>
-                    <button class="btn-view" (click)="verAdiantamento()">Ver</button>
-                </td>
-            </tr>
+          <tr *ngFor="let item of paginaAtualizada">
+            <td class="id-cell">#{{ item.id }}</td>
+            <td class="name-cell">{{ item.nome }}</td>
+            <td>{{ item.desc }}</td>
+            <td class="value-cell">{{ item.valor }}</td>
+            <td>
+              <span class="currency-badge">{{ item.moeda }}</span>
+            </td>
+            <td class="date-cell">{{ item.data | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span class="tag {{ item.status }}">{{ item.status }}</span>
+            </td>
+            <td>
+              <button class="btn-view" (click)="verAdiantamento()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                Ver
+              </button>
+            </td>
+          </tr>
         </tbody>
-    </table>
-</div>
-
-<!-- PAGINATION -->
-<div class="pagination">
-
-    <button class="arrow-btn"
-        [disabled]="pagina === 1"
-        (click)="paginaAnterior()">
-    <
-    </button>
-
-
-    <div class="page-number">
-        {{ pagina }}
+      </table>
     </div>
 
-    <button class="arrow-btn"
-        [disabled]="pagina === totalPaginas"
-        (click)="paginaProxima()">
-    >
-    </button>
+    <!-- PAGINATION -->
+    <div class="pagination" *ngIf="totalPaginas > 1">
+      <button class="pagination-btn" [disabled]="pagina === 1" (click)="paginaAnterior()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
 
+      <div class="pagination-info">
+        <span class="current-page">{{ pagina }}</span>
+        <span class="separator">/</span>
+        <span class="total-pages">{{ totalPaginas }}</span>
+      </div>
 
-</div>
+      <button class="pagination-btn" [disabled]="pagina === totalPaginas" (click)="paginaProxima()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
 
 </section>

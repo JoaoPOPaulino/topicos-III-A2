@@ -20,7 +20,6 @@ interface ConversionResult {
   styleUrls: ['./conversor.css'],
 })
 export class Conversor {
-
   currencies = ['BRL', 'USD', 'EUR', 'GBP', 'JPY', 'ARS', 'CAD'];
 
   from: string = 'BRL';
@@ -57,7 +56,7 @@ export class Conversor {
     }
 
     this.loading = true;
-    this.cdr.detectChanges(); // Atualiza a tela imediatamente ao iniciar carregamento
+    this.cdr.detectChanges();
 
     try {
       const pair = `${this.from}-${this.to}`;
@@ -78,18 +77,19 @@ export class Conversor {
         amount: this.amount,
         converted,
         rate,
-        date: new Date().toLocaleString('pt-BR')
+        date: new Date().toLocaleString('pt-BR'),
       };
 
       this.history.unshift(this.result);
-
     } catch (err) {
       this.errorMessage = 'Erro ao buscar taxa de câmbio.';
     }
 
     this.loading = false;
-
-    // Força a interface atualizar imediatamente
     this.cdr.detectChanges();
+  }
+
+  clearHistory() {
+    this.history = [];
   }
 }

@@ -12,31 +12,55 @@ import { Location } from '@angular/common';
   styleUrl: './editar-adiantamento.css',
 })
 export class EditarAdiantamento {
-
   constructor(private location: Location) {}
 
   private fb = inject(FormBuilder);
 
   sidebarOpen = false;
   profileMenuOpen = false;
+  showSuccessAlert = false;
+  selectedFileName = '';
 
   adiantamentoForm = this.fb.group({
-    solicitante: ['', Validators.required],
-    descricao: ['', Validators.required],
-    valor: ['', Validators.required],
+    solicitante: ['Lucas Henderson', Validators.required],
+    descricao: ['Viagem para reunião em Brasília', Validators.required],
+    valor: ['850,00', Validators.required],
     moeda: ['BRL', Validators.required],
-    data: ['', Validators.required],
+    data: ['2025-01-31', Validators.required],
     categoria: ['transporte', Validators.required],
     status: ['Pendente', Validators.required],
-    anexo: [null]
+    justificativa: [''],
+    anexo: [null],
   });
 
-  // ===== SIDEBAR MOBILE =====
+  categorias = [
+    { value: 'transporte', label: 'Transporte', icon: 'car' },
+    { value: 'alimentacao', label: 'Alimentação', icon: 'utensils' },
+    { value: 'hospedagem', label: 'Hospedagem', icon: 'home' },
+    { value: 'material', label: 'Material de Escritório', icon: 'package' },
+    { value: 'outros', label: 'Outros', icon: 'more' },
+  ];
+
+  statusOptions = [
+    { value: 'Pendente', label: 'Pendente' },
+    { value: 'Revisão', label: 'Revisão' },
+    { value: 'Aprovado', label: 'Aprovado' },
+    { value: 'Atrasado', label: 'Atrasado' },
+    { value: 'Rejeitado', label: 'Rejeitado' },
+    { value: 'Pago', label: 'Pago' },
+  ];
+
+  moedas = [
+    { value: 'BRL', label: 'Real Brasileiro (BRL)' },
+    { value: 'USD', label: 'Dólar Americano (USD)' },
+    { value: 'EUR', label: 'Euro (EUR)' },
+    { value: 'GBP', label: 'Libra Esterlina (GBP)' },
+  ];
+
   toggleMenu() {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
-  // ===== DROPDOWN PERFIL =====
   toggleProfileMenu(event: MouseEvent) {
     event.stopPropagation();
     this.profileMenuOpen = !this.profileMenuOpen;
@@ -46,17 +70,32 @@ export class EditarAdiantamento {
     this.profileMenuOpen = false;
   }
 
-  // ===== MÁSCARA DE VALOR =====
   onValorInput(event: Event) {
     const input = event.target as HTMLInputElement;
     let v = input.value.replace(/\D/g, '');
+    if (v === '') {
+      input.value = '';
+      return;
+    }
     v = (Number(v) / 100).toFixed(2);
     v = v.replace('.', ',');
-    input.value = 'R$ ' + v;
+    v = v.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    input.value = v;
     this.adiantamentoForm.patchValue({ valor: input.value });
   }
 
-  // ===== SUBMIT =====
+  onFileChange(event: any) {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const fileNames = Array.from(files)
+        .map((f: any) => f.name)
+        .join(', ');
+      this.selectedFileName = fileNames;
+    } else {
+      this.selectedFileName = '';
+    }
+  }
+
   submit() {
     if (this.adiantamentoForm.invalid) {
       this.adiantamentoForm.markAllAsTouched();
@@ -64,10 +103,20 @@ export class EditarAdiantamento {
     }
 
     console.log('ADIANTAMENTO ATUALIZADO:', this.adiantamentoForm.value);
-    alert('Adiantamento salvo com sucesso!');
+
+    this.showSuccessAlert = true;
+    setTimeout(() => {
+      this.showSuccessAlert = false;
+      this.voltar();
+    }, 2000);
   }
 
   voltar(): void {
     this.location.back();
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.adiantamentoForm.get(fieldName);
+    return !!(field && field.invalid && field.touched);
   }
 }

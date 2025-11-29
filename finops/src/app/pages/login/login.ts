@@ -1,23 +1,29 @@
+// src/app/pages/login/login.ts (Modificado)
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { AuthService } from '../../service/auth';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
- 
   private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   showPassword = false;
+  loginError = '';
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(4)]]
+    password: ['', [Validators.required, Validators.minLength(4)]],
   });
 
   togglePassword() {
@@ -25,19 +31,28 @@ export class Login {
   }
 
   submit() {
+    this.loginError = '';
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
-    const { email, password } = this.loginForm.value;
+    const credentials = {
+      email: this.loginForm.value.email!,
+      senha: this.loginForm.value.password!,
+    };
 
-    console.log('ENVIANDO (futuro backend):', {
-      email,
-      password
+    this.authService.login(credentials).subscribe({
+      next: (userData) => {
+        console.log('Login Sucedido:', userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        console.error('Erro de Login:', err);
+        this.loginError = 'Email ou senha inválidos. Tente novamente.';
+      },
     });
-
-    alert('Login realizado com sucesso (frontend)!');
   }
 
   get email() {

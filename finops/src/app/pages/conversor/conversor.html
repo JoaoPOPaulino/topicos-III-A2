@@ -1,13 +1,23 @@
 <section class="content-section conversor">
 
   <div class="header">
-    <h1>Conversor de Moedas</h1>
+    <div class="header-content">
+      <div class="icon-title">
+        <svg class="exchange-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+          <circle cx="12" cy="5" r="3"></circle>
+        </svg>
+        <h1>Conversor de Moedas</h1>
+      </div>
+      <p class="subtitle">Converta valores entre diferentes moedas em tempo real</p>
+    </div>
   </div>
 
   <!-- Card principal -->
   <div class="card converter-box">
 
-    <div class="row">
+    <div class="converter-grid">
       <div class="field">
         <label>Moeda Origem</label>
         <select [(ngModel)]="from">
@@ -15,7 +25,14 @@
         </select>
       </div>
 
-      <button class="invert" (click)="invertCurrencies()">⇄</button>
+      <button class="invert-btn" (click)="invertCurrencies()" title="Inverter moedas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="17 1 21 5 17 9"></polyline>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+          <polyline points="7 23 3 19 7 15"></polyline>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+        </svg>
+      </button>
 
       <div class="field">
         <label>Moeda Destino</label>
@@ -25,55 +42,116 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="field full">
-        <label>Valor a converter</label>
+    <div class="field-amount">
+      <label>Valor a converter</label>
+      <div class="input-with-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
         <input type="number" [(ngModel)]="amount" placeholder="Ex: 100.00" />
       </div>
     </div>
 
     <button class="btn-convert" (click)="convert()" [disabled]="loading">
-      {{ loading ? 'Convertendo...' : 'Converter' }}
+      <span *ngIf="!loading">Converter</span>
+      <span *ngIf="loading" class="loading-text">
+        <span class="spinner-small"></span>
+        Convertendo...
+      </span>
     </button>
 
-    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <div class="error-message" *ngIf="errorMessage">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ errorMessage }}
+    </div>
 
     <div class="result-card" *ngIf="result">
-      <h3>Resultado</h3>
-      <p><strong>{{ result.amount | number:'1.2-2' }} {{ result.from }}</strong> =</p>
-      <h2>{{ result.converted | number:'1.2-2' }} {{ result.to }}</h2>
-      <p class="rate">Taxa usada: {{ result.rate }} ({{ result.from }} → {{ result.to }})</p>
-      <p class="date">Atualizado em: {{ result.date }}</p>
+      <div class="result-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <h3>Resultado da Conversão</h3>
+      </div>
+      
+      <div class="result-content">
+        <div class="from-amount">
+          <span class="value">{{ result.amount | number:'1.2-2' }}</span>
+          <span class="currency">{{ result.from }}</span>
+        </div>
+        
+        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+        
+        <div class="to-amount">
+          <span class="value">{{ result.converted | number:'1.2-2' }}</span>
+          <span class="currency">{{ result.to }}</span>
+        </div>
+      </div>
+
+      <div class="result-details">
+        <div class="detail-item">
+          <span class="label">Taxa de câmbio:</span>
+          <span class="value">1 {{ result.from }} = {{ result.rate | number:'1.4-4' }} {{ result.to }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Atualizado em:</span>
+          <span class="value">{{ result.date }}</span>
+        </div>
+      </div>
     </div>
 
   </div>
 
   <!-- Histórico -->
   <div class="card history-box" *ngIf="history.length > 0">
-    <h2>Histórico de Conversões</h2>
+    <div class="history-header">
+      <div class="title-with-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <h2>Histórico de Conversões</h2>
+      </div>
+      <button class="btn-clear" (click)="clearHistory()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        Limpar
+      </button>
+    </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>De</th>
-          <th>Para</th>
-          <th>Valor</th>
-          <th>Convertido</th>
-          <th>Taxa</th>
-          <th>Data</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let h of history">
-          <td>{{ h.from }}</td>
-          <td>{{ h.to }}</td>
-          <td>{{ h.amount }}</td>
-          <td>{{ h.converted | number:'1.2-2' }}</td>
-          <td>{{ h.rate }}</td>
-          <td>{{ h.date }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>De</th>
+            <th>Para</th>
+            <th>Valor</th>
+            <th>Convertido</th>
+            <th>Taxa</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let h of history">
+            <td><span class="currency-badge">{{ h.from }}</span></td>
+            <td><span class="currency-badge">{{ h.to }}</span></td>
+            <td>{{ h.amount | number:'1.2-2' }}</td>
+            <td class="highlight">{{ h.converted | number:'1.2-2' }}</td>
+            <td>{{ h.rate | number:'1.4-4' }}</td>
+            <td class="date-cell">{{ h.date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
 </section>
