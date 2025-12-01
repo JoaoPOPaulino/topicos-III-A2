@@ -50,10 +50,58 @@ export class Adiantamentos implements OnInit {
   // Dados reais carregados da API
   allRequests: AdiantamentoExibicao[] = []; 
 
+<<<<<<< HEAD
   search = '';
   status = '';
   dataInicial = '';
   dataFinal = '';
+=======
+    {
+      id: 1006,
+      nome: 'Eduardo Melo',
+      desc: 'Reunião SP',
+      valor: '€ 120,00',
+      moeda: 'EUR',
+      data: '2025-02-01',
+      status: 'Aprovado',
+    },
+    {
+      id: 1007,
+      nome: 'Bianca Souza',
+      desc: 'Uber',
+      valor: 'R$ 40,00',
+      moeda: 'BRL',
+      data: '2025-02-03',
+      status: 'Cancelado',
+    },
+    {
+      id: 1008,
+      nome: 'Ricardo Lima',
+      desc: 'Hospedagem',
+      valor: '$ 200.00',
+      moeda: 'USD',
+      data: '2025-01-24',
+      status: 'Cancelado',
+    },
+    {
+      id: 1009,
+      nome: 'Juliana Prado',
+      desc: 'Material Escritório',
+      valor: 'R$ 95,00',
+      moeda: 'BRL',
+      data: '2025-02-05',
+      status: 'Pendente',
+    },
+    {
+      id: 1010,
+      nome: 'Ana Souza',
+      desc: 'Passagem Aérea',
+      valor: '$ 540.00',
+      moeda: 'USD',
+      data: '2025-02-05',
+      status: 'Aprovado',
+    },
+>>>>>>> ab2cb2bde64641de178c3bb1b26034c331979e47
 
   pagina = 1;
   itensPorPagina = 10;

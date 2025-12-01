@@ -176,15 +176,19 @@
 }
 
 .status-Atrasado {
-  background: #fcdee0;
-  color: #E63946;
-  border-color: #E63946;
+  background: #ffe9d1;
+  color: #f59734;
+  border-color: #f59734;
 }
 
 .status-Rejeitado {
   background: #fcdee0;
   color: #E63946;
   border-color: #E63946;
+}
+
+.tag.Cancelado {
+  border-color: black;
 }
 
 /* CONTENT GRID */
