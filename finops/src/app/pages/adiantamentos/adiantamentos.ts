@@ -1,309 +1,161 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { AdvanceRequestService } from '../../service/advence-request';
+
+// -----------------------------------------------------------
+// 1. Interfaces (Correspondem ao SolicitacaoAdiantamentoListDto do back-end)
+// -----------------------------------------------------------
+
+interface AdiantamentoItemDto {
+  id: number;
+  solicitanteNome: string;
+  descricao: string;
+  valor: number;
+  moedaCodigo: string;
+  valorFormatado: string;
+  dataCriacao: string; 
+  statusDescricao: string; 
+}
+
+// Interface usada para exibição na tabela 
+interface AdiantamentoExibicao {
+  id: number;
+  nome: string; // = solicitanteNome
+  desc: string; // = descricao
+  valor: string; // = valorFormatado
+  moeda: string; // = moedaCodigo
+  data: string;
+  status: string; // = statusDescricao
+}
 
 @Component({
-  selector: 'app-adiantamentos',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './adiantamentos.html',
-  styleUrl: './adiantamentos.css',
+  selector: 'app-adiantamentos',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule], 
+  templateUrl: './adiantamentos.html',
+  styleUrl: './adiantamentos.css',
 })
-export class Adiantamentos {
-  constructor(private router: Router) {}
+export class Adiantamentos implements OnInit {
+  private router = inject(Router);
+  private advanceService = inject(AdvanceRequestService); 
 
-  sidebarOpen = false;
-  profileMenuOpen = false;
+  sidebarOpen = false;
+  profileMenuOpen = false;
+  loading = false;
+  errorMessage = '';
 
-  // Dados mock
-  dados = [
-    {
-      id: 1001,
-      nome: 'Lucas Henderson',
-      desc: 'Viagem Brasília',
-      valor: 'R$ 850,00',
-      moeda: 'BRL',
-      data: '2025-01-31',
-      status: 'Pendente',
-    },
-    {
-      id: 1002,
-      nome: 'Ana Costa',
-      desc: 'Compra materiais',
-      valor: '$ 320.00',
-      moeda: 'USD',
-      data: '2025-02-02',
-      status: 'Rejeitado',
-    },
-    {
-      id: 1003,
-      nome: 'Carlos Silva',
-      desc: 'Alimentação',
-      valor: 'R$ 150,00',
-      moeda: 'BRL',
-      data: '2025-02-02',
-      status: 'Atrasado',
-    },
-    {
-      id: 1004,
-      nome: 'Mariana Torres',
-      desc: 'Hotel',
-      valor: '€ 210,00',
-      moeda: 'EUR',
-      data: '2025-01-28',
-      status: 'Pago',
-    },
-    {
-      id: 1005,
-      nome: 'João Paulo',
-      desc: 'Taxi',
-      valor: 'R$ 45,00',
-      moeda: 'BRL',
-      data: '2025-02-04',
-      status: 'Pendente',
-    },
+  // Dados reais carregados da API
+  allRequests: AdiantamentoExibicao[] = []; 
 
-    {
-      id: 1006,
-      nome: 'Eduardo Melo',
-      desc: 'Reunião SP',
-      valor: '€ 120,00',
-      moeda: 'EUR',
-      data: '2025-02-01',
-      status: 'Aprovado',
-    },
-    {
-      id: 1007,
-      nome: 'Bianca Souza',
-      desc: 'Uber',
-      valor: 'R$ 40,00',
-      moeda: 'BRL',
-      data: '2025-02-03',
-      status: 'Revisão',
-    },
-    {
-      id: 1008,
-      nome: 'Ricardo Lima',
-      desc: 'Hospedagem',
-      valor: '$ 200.00',
-      moeda: 'USD',
-      data: '2025-01-24',
-      status: 'Pago',
-    },
-    {
-      id: 1009,
-      nome: 'Juliana Prado',
-      desc: 'Material Escritório',
-      valor: 'R$ 95,00',
-      moeda: 'BRL',
-      data: '2025-02-05',
-      status: 'Pendente',
-    },
-    {
-      id: 1010,
-      nome: 'Ana Souza',
-      desc: 'Passagem Aérea',
-      valor: '$ 540.00',
-      moeda: 'USD',
-      data: '2025-02-05',
-      status: 'Aprovado',
-    },
+  search = '';
+  status = '';
+  dataInicial = '';
+  dataFinal = '';
 
-    {
-      id: 1011,
-      nome: 'Thiago Ramos',
-      desc: 'Combustível',
-      valor: 'R$ 200,00',
-      moeda: 'BRL',
-      data: '2025-02-02',
-      status: 'Revisão',
-    },
-    {
-      id: 1012,
-      nome: 'Cristina Alves',
-      desc: 'Hospedagem',
-      valor: 'R$ 310,00',
-      moeda: 'BRL',
-      data: '2025-01-29',
-      status: 'Pago',
-    },
-    {
-      id: 1013,
-      nome: 'Diego Santos',
-      desc: 'Almoço equipe',
-      valor: 'R$ 180,00',
-      moeda: 'BRL',
-      data: '2025-02-04',
-      status: 'Pendente',
-    },
-    {
-      id: 1014,
-      nome: 'Larissa Fonseca',
-      desc: 'Transporte',
-      valor: '$ 64.00',
-      moeda: 'USD',
-      data: '2025-02-03',
-      status: 'Aprovado',
-    },
-    {
-      id: 1015,
-      nome: 'Renato Silva',
-      desc: 'Alimentação',
-      valor: '€ 48,00',
-      moeda: 'EUR',
-      data: '2025-02-05',
-      status: 'Revisão',
-    },
+  pagina = 1;
+  itensPorPagina = 10;
+  paginaAtualizada: AdiantamentoExibicao[] = []; 
+  totalPaginas = 1;
 
-    {
-      id: 1016,
-      nome: 'Marcos Tavares',
-      desc: 'Uber',
-      valor: 'R$ 32,00',
-      moeda: 'BRL',
-      data: '2025-02-05',
-      status: 'Pendente',
-    },
-    {
-      id: 1017,
-      nome: 'Alice Martins',
-      desc: 'Passagem',
-      valor: '$ 233.00',
-      moeda: 'USD',
-      data: '2025-02-02',
-      status: 'Pago',
-    },
-    {
-      id: 1018,
-      nome: 'Felipe Rocha',
-      desc: 'Taxi',
-      valor: 'R$ 22,00',
-      moeda: 'BRL',
-      data: '2025-02-04',
-      status: 'Pendente',
-    },
-    {
-      id: 1019,
-      nome: 'Heloísa Cruz',
-      desc: 'Hotel',
-      valor: '€ 135,00',
-      moeda: 'EUR',
-      data: '2025-01-28',
-      status: 'Aprovado',
-    },
-    {
-      id: 1020,
-      nome: 'Bruna Ferreira',
-      desc: 'Material',
-      valor: 'R$ 80,00',
-      moeda: 'BRL',
-      data: '2025-02-01',
-      status: 'Revisão',
-    },
-  ];
+  ngOnInit() {
+    this.loadRequests(); // Carrega os dados reais ao iniciar
+  }
 
-  search = '';
-  status = '';
-  dataInicial = '';
-  dataFinal = '';
+// -----------------------------------------------------------
+// 2. FUNÇÃO DE CARREGAMENTO (CHAMA A API COM FILTROS)
+// -----------------------------------------------------------
 
-  pagina = 1;
-  itensPorPagina = 10;
-  paginaAtualizada: any[] = [];
-  totalPaginas = 1;
+  loadRequests() {
+    this.loading = true;
+    this.errorMessage = '';
+    
+    // Mapear filtros Angular para parâmetros da API (serão limpos no serviço)
+    const params = {
+      search: this.search,
+      status: this.status,
+      dataInicial: this.dataInicial,
+      dataFinal: this.dataFinal
+    };
 
-  ngOnInit() {
-    this.filtrar();
-  }
+    this.advanceService.getAdvanceRequests(params).subscribe({
+      next: (data: AdiantamentoItemDto[]) => {
+        // Mapeia o DTO do back-end para o formato de exibição 
+        this.allRequests = data.map(item => ({
+            id: item.id,
+            nome: item.solicitanteNome,
+            desc: item.descricao,
+            valor: item.valorFormatado, 
+            moeda: item.moedaCodigo,
+            data: item.dataCriacao,
+            status: item.statusDescricao, 
+        }));
+        
+        this.loading = false;
+        this.totalPaginas = Math.ceil(this.allRequests.length / this.itensPorPagina);
+        this.filtrarPaginacao(this.allRequests); // Aplica a paginação
+      },
+      error: (err) => {
+        console.error('Erro ao carregar adiantamentos:', err);
+        this.loading = false;
+        if (err.status === 400) {
+            this.errorMessage = 'Erro de validação nos filtros (400 Bad Request).';
+        } else {
+            this.errorMessage = 'Não foi possível carregar a lista. Verifique a API.';
+        }
+      }
+    });
+  }
 
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
+// -----------------------------------------------------------
+// 3. LÓGICA DE FILTRAGEM E PAGINAÇÃO
+// -----------------------------------------------------------
+  
+  filtrar() {
+    this.loadRequests(); // Recarrega a lista com os filtros atualizados
+  }
 
-  toggleProfileMenu() {
-    this.profileMenuOpen = !this.profileMenuOpen;
-  }
-
-  filtrar() {
-    let filtrados = this.dados.filter((item) => {
-      const texto = (
-        item.nome +
-        ' ' +
-        item.desc +
-        ' ' +
-        item.valor +
-        ' ' +
-        item.status
-      ).toLowerCase();
-
-      if (!texto.includes(this.search.toLowerCase())) return false;
-      if (this.status && item.status !== this.status) return false;
-
-      const data = new Date(item.data);
-      if (this.dataInicial && data < new Date(this.dataInicial)) return false;
-      if (this.dataFinal && data > new Date(this.dataFinal)) return false;
-
-      return true;
-    });
-
-    this.totalPaginas = Math.ceil(filtrados.length / this.itensPorPagina);
-    this.pagina = 1;
-
-    this.paginaAtualizada = filtrados.slice(0, this.itensPorPagina);
-  }
-
-  atualizarPaginacao() {
+  filtrarPaginacao(requests: AdiantamentoExibicao[]) {
     const inicio = (this.pagina - 1) * this.itensPorPagina;
-    const fim = inicio + this.itensPorPagina;
-
-    let filtrados = this.dados.filter((item) => {
-      const texto = (
-        item.nome +
-        ' ' +
-        item.desc +
-        ' ' +
-        item.valor +
-        ' ' +
-        item.status
-      ).toLowerCase();
-
-      if (!texto.includes(this.search.toLowerCase())) return false;
-      if (this.status && item.status !== this.status) return false;
-
-      const data = new Date(item.data);
-      if (this.dataInicial && data < new Date(this.dataInicial)) return false;
-      if (this.dataFinal && data > new Date(this.dataFinal)) return false;
-
-      return true;
-    });
-
-    this.paginaAtualizada = filtrados.slice(inicio, fim);
+    const fim = inicio + this.itensPorPagina;
+    
+    this.paginaAtualizada = requests.slice(inicio, fim);
   }
 
-  paginaAnterior() {
-    this.pagina--;
-    this.atualizarPaginacao();
-  }
+  atualizarPaginacao() {
+    this.filtrarPaginacao(this.allRequests);
+  }
+  
+  paginaAnterior() {
+    if (this.pagina > 1) {
+      this.pagina--;
+      this.atualizarPaginacao();
+    }
+  }
 
-  paginaProxima() {
-    this.pagina++;
-    this.atualizarPaginacao();
-  }
+  paginaProxima() {
+    if (this.pagina < this.totalPaginas) {
+      this.pagina++;
+      this.atualizarPaginacao();
+    }
+  }
+  
+  limparFiltros() {
+    this.search = '';
+    this.status = '';
+    this.dataInicial = '';
+    this.dataFinal = '';
+    this.filtrar(); // Chama loadRequests
+  }
 
-  limparFiltros() {
-    this.search = '';
-    this.status = '';
-    this.dataInicial = '';
-    this.dataFinal = '';
-    this.filtrar();
-  }
+  novoAdiantamento() {
+    this.router.navigate(['/novo-adiantamento']);
+  }
 
-  novoAdiantamento() {
-    this.router.navigate(['/novo-adiantamento']);
-  }
-
-  verAdiantamento() {
-    this.router.navigate(['/ver-adiantamento']);
-  }
+  // Passar o ID (ainda não implementado no HTML, mas pronto aqui)
+  verAdiantamento(id: number) {
+    this.router.navigate(['/ver-adiantamento'], { queryParams: { id: id } }); 
+  }
 }

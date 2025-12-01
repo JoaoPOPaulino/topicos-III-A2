@@ -34,7 +34,6 @@
     </div>
   </div>
 
-  <!-- Status Badge -->
   <div class="status-banner" [class]="'status-' + getStatusClass()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="10"></circle>
@@ -48,7 +47,6 @@
 
   <div class="content-grid">
     
-    <!-- Informações Principais -->
     <div class="info-card">
       <div class="card-header">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -70,8 +68,8 @@
               </svg>
               <span>Solicitante</span>
             </div>
-            <p class="info-value">{{ dados.solicitante }}</p>
-            <span class="info-meta">{{ dados.email }}</span>
+            <p class="info-value">{{ dados.solicitanteNome }}</p> 
+            <span class="info-meta">Criado por: {{ dados.criadoPorNome }}</span>
           </div>
 
           <div class="info-item">
@@ -82,7 +80,7 @@
               </svg>
               <span>Departamento</span>
             </div>
-            <p class="info-value">{{ dados.departamento }}</p>
+            <p class="info-value">{{ dados.departamentoNome }}</p>
           </div>
 
           <div class="info-item">
@@ -93,47 +91,48 @@
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
-              <span>Data</span>
+              <span>Data Criação</span>
             </div>
-            <p class="info-value">{{ dados.data | date: 'dd/MM/yyyy' }}</p>
+            <p class="info-value">{{ dados.dataCriacao | date: 'dd/MM/yyyy' }}</p>
           </div>
 
           <div class="info-item">
             <div class="info-label">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
               </svg>
-              <span>Categoria</span>
+              <span>Pagamento Requerido</span>
             </div>
-            <p class="info-value">{{ dados.categoria }}</p>
+            <p class="info-value">{{ dados.dataPagamentoRequerida | date: 'dd/MM/yyyy' }}</p>
+            <span class="info-meta" *ngIf="dados.dataPagamentoAjustada">Ajustado: {{ dados.dataPagamentoAjustada | date: 'dd/MM/yyyy' }}</span>
           </div>
-
+          
           <div class="info-item full-width">
             <div class="info-label">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
-              <span>Descrição</span>
+              <span>Justificativa</span>
             </div>
-            <p class="info-value">{{ dados.descricao }}</p>
+            <p class="info-value">{{ dados.justificativaCompleta }}</p>
           </div>
-
-          <div class="info-item full-width" *ngIf="dados.justificativa">
+          
+          <div class="info-item full-width" *ngIf="dados.observacoes">
             <div class="info-label">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
               </svg>
-              <span>Justificativa</span>
+              <span>Observações</span>
             </div>
-            <p class="info-value">{{ dados.justificativa }}</p>
+            <p class="info-value">{{ dados.observacoes }}</p>
           </div>
 
         </div>
       </div>
     </div>
 
-    <!-- Valores -->
     <div class="info-card">
       <div class="card-header">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -146,8 +145,8 @@
       <div class="card-content">
         <div class="valor-destaque">
           <span class="valor-label">Valor Solicitado</span>
-          <span class="valor-principal">{{ dados.valor }}</span>
-          <span class="valor-moeda">{{ dados.moeda }}</span>
+          <span class="valor-principal">{{ dados.valorFormatado }}</span>
+          <span class="valor-moeda">{{ dados.moedaCodigo }}</span>
         </div>
 
         <div class="info-grid">
@@ -159,7 +158,7 @@
               </svg>
               <span>Código PTAX</span>
             </div>
-            <p class="info-value">{{ dados.ptax }}</p>
+            <p class="info-value">N/A</p> 
           </div>
         </div>
       </div>
@@ -167,7 +166,6 @@
 
   </div>
 
-  <!-- Anexos -->
   <div class="info-card">
     <div class="card-header">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -178,7 +176,7 @@
 
     <div class="card-content">
       <div class="anexos-grid">
-        <div class="anexo-item" *ngFor="let anexo of dados.anexos" (click)="downloadAnexo(anexo)">
+        <div class="anexo-item" *ngFor="let anexo of getAnexosFormatados()" (click)="downloadAnexo(anexo)"> 
           <div class="anexo-icon" [class]="anexo.tipo">
             <svg *ngIf="anexo.tipo === 'pdf'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -191,7 +189,7 @@
             </svg>
           </div>
           <div class="anexo-info">
-            <span class="anexo-nome">{{ anexo.nome }}</span>
+            <span class="anexo-nome">{{ anexo.nome }}</span> 
             <span class="anexo-tamanho">{{ anexo.tamanho }}</span>
           </div>
           <button class="anexo-download">
@@ -206,7 +204,6 @@
     </div>
   </div>
 
-  <!-- Histórico -->
   <div class="info-card">
     <div class="card-header">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

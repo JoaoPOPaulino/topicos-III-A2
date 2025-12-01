@@ -1,64 +1,48 @@
-<section class="content">
-<div class="page-header">
-    <h1 class="page-title">Novo Adiantamento</h1>
-
-    <div class="header-buttons">
-        <button class="btn-back" (click)="voltar()">Voltar</button>
-    </div>
-</div>
 <form class="form-container" (ngSubmit)="salvar()">
 
     <div class="form-group">
         <label>Solicitante</label>
-        <input type="text" [(ngModel)]="form.solicitante" name="solicitante" required placeholder="Nome do solicitante">
+        <select [(ngModel)]="form.colaboradorId" name="solicitante" required>
+            <option *ngFor="let colab of colaboradores" [ngValue]="colab.id">{{ colab.nomeCompleto }}</option>
+        </select>
     </div>
-
+    
     <div class="form-group">
-        <label>Descrição</label>
-        <input type="text" [(ngModel)]="form.descricao" name="descricao" required placeholder="Descreva o motivo do adiantamento">
-    </div>
-
-    <div class="row">
-
-        <div class="form-group">
-            <label>Valor</label>
-            <input type="text" name="valor" [(ngModel)]="form.valor" (input)="mascaraValor($event)" placeholder="R$ 0,00" required>
-        </div>
-
-        <div class="form-group">
-            <label>Moeda</label>
-            <select [(ngModel)]="form.moeda" name="moeda">
-                <option value="BRL">BRL</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Data</label>
-            <input type="date" [(ngModel)]="form.data" name="data" required>
-        </div>
-
-    </div>
-
-    <div class="form-group">
-        <label>Categoria</label>
-        <select [(ngModel)]="form.categoria" name="categoria">
-            <option value="transporte">Transporte</option>
-            <option value="alimentacao">Alimentação</option>
-            <option value="hospedagem">Hospedagem</option>
-            <option value="material">Material de Escritório</option>
-            <option value="outros">Outros</option>
+        <label>Departamento</label>
+        <select [(ngModel)]="form.departamentoId" name="departamento" required>
+            <option *ngFor="let dept of departamentos" [ngValue]="dept.id">{{ dept.nome }}</option>
         </select>
     </div>
 
     <div class="form-group">
-        <label>Anexos (opcional)</label>
-        <input type="file" (change)="selecionarArquivos($event)" multiple>
+        <label>Descrição</label>
+        <input type="text" [(ngModel)]="form.justificativa" name="descricao" required placeholder="Descreva o motivo do adiantamento">
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label>Valor</label>
+            <input type="text" name="valor" [(ngModel)]="form.valorMascarado" (input)="mascaraValor($event)" placeholder="R$ 0,00" required>
+        </div>
+
+        <div class="form-group">
+            <label>Moeda</label>
+            <select [(ngModel)]="form.moedaId" name="moeda">
+                <option *ngFor="let moeda of moedas" [ngValue]="moeda.id">{{ moeda.codigo }} - {{ moeda.simbolo }}</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Data Requerida</label>
+            <input type="date" [(ngModel)]="form.dataPagamentoRequerida" name="data" required>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label>Observações (opcional)</label>
+        <input type="text" [(ngModel)]="form.observacoes" name="observacoes" placeholder="Outras notas">
     </div>
 
     <button class="btn-primary" type="submit">Salvar Adiantamento</button>
 
 </form>
-
-</section>

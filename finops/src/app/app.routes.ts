@@ -1,4 +1,7 @@
+// app.routes.ts
+
 import { Routes } from '@angular/router';
+// Importações dos componentes de Page e Layout
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Adiantamentos } from './pages/adiantamentos/adiantamentos';
 import { NovoAdiantamento } from './pages/novo-adiantamento/novo-adiantamento';
@@ -14,75 +17,79 @@ import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { MainLayout } from './layouts/main-layout/main-layout';
 
 export const routes: Routes = [
-      {
-    path: '',
-    component: AuthLayout,
-    children: [
-      {
-        path: 'login',
-        loadComponent: () =>
-          import('./pages/login/login').then(m => m.Login)
-      }
-    ]
-  },
 
+    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    
+    // 2. Rotas de Autenticação (Layout Simples - AuthLayout)
     {
-    path: '',
-    component: MainLayout,
-    children: [
-      {
-        path: 'dashboard',
-        loadComponent: () =>
-          import('./pages/dashboard/dashboard').then(m => m.Dashboard)
-      },
-      {
-        path: 'adiantamentos',
-        loadComponent: () =>
-          import('./pages/adiantamentos/adiantamentos').then(m => m.Adiantamentos)
-      },
-      {
-        path: 'novo-adiantamento',
-        loadComponent: () =>
-          import('./pages/novo-adiantamento/novo-adiantamento').then(m => m.NovoAdiantamento)
-      },
-       {
-        path: 'ver-adiantamento',
-        loadComponent: () =>
-          import('./pages/ver-adiantamento/ver-adiantamento').then(m => m.VerAdiantamento)
-      },
-      {
-        path: 'perfil',
-        loadComponent: () =>
-          import('./pages/perfil/perfil').then(m => m.Perfil)
-      },
-       {
-        path: 'editar-adiantamento',
-        loadComponent: () =>
-          import('./pages/editar-adiantamento/editar-adiantamento').then(m => m.EditarAdiantamento)
-      },
-      {
-        path: 'aprovacoes',
-        loadComponent: () =>
-          import('./pages/aprovacoes/aprovacoes').then(m => m.Aprovacoes)
-      },
-      {
-        path: 'conversor',
-        loadComponent: () =>
-          import('./pages/conversor/conversor').then(m => m.Conversor)
-      },
-      {
-        path: 'feriados',
-        loadComponent: () =>
-          import('./pages/feriados/feriados').then(m => m.Feriados)
-      },
-      {
-        path: 'configuracoes',
-        loadComponent: () =>
-          import('./pages/configuracoes/configuracoes').then(m => m.Configuracoes)
-      },
-    ]
-  },
+        path: '',
+        component: AuthLayout,
+        children: [
+            {
+                path: 'login',
+                loadComponent: () =>
+                    import('./pages/login/login').then(m => m.Login)
+            }
+        ]
+    },
 
-  // Redireciona para login ao abrir
-  { path: '**', redirectTo: 'login' },
+    // 3. Rotas Principais (Layout Completo com Sidebar - MainLayout)
+    {
+        path: '', 
+        component: MainLayout,
+        children: [
+            {
+                path: 'dashboard',
+                loadComponent: () =>
+                    import('./pages/dashboard/dashboard').then(m => m.Dashboard)
+            },
+            {
+                path: 'adiantamentos',
+                loadComponent: () =>
+                    import('./pages/adiantamentos/adiantamentos').then(m => m.Adiantamentos)
+            },
+            {
+                path: 'novo-adiantamento',
+                loadComponent: () =>
+                    import('./pages/novo-adiantamento/novo-adiantamento').then(m => m.NovoAdiantamento)
+            },
+            {
+                path: 'ver-adiantamento',
+                loadComponent: () =>
+                    import('./pages/ver-adiantamento/ver-adiantamento').then(m => m.VerAdiantamento)
+            },
+            {
+                path: 'editar-adiantamento',
+                loadComponent: () =>
+                    import('./pages/editar-adiantamento/editar-adiantamento').then(m => m.EditarAdiantamento)
+            },
+            {
+                path: 'perfil',
+                loadComponent: () =>
+                    import('./pages/perfil/perfil').then(m => m.Perfil)
+            },
+            {
+                path: 'aprovacoes',
+                loadComponent: () =>
+                    import('./pages/aprovacoes/aprovacoes').then(m => m.Aprovacoes)
+            },
+            {
+                path: 'conversor',
+                loadComponent: () =>
+                    import('./pages/conversor/conversor').then(m => m.Conversor)
+            },
+            {
+                path: 'feriados',
+                loadComponent: () =>
+                    import('./pages/feriados/feriados').then(m => m.Feriados)
+            },
+            {
+                path: 'configuracoes',
+                loadComponent: () =>
+                    import('./pages/configuracoes/configuracoes').then(m => m.Configuracoes)
+            },
+        ]
+    },
+
+    { path: '**', redirectTo: 'login' },
 ];

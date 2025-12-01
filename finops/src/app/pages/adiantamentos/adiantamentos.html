@@ -20,7 +20,6 @@
     </button>
   </div>
 
-  <!-- FILTERS -->
   <div class="filters-card">
     <div class="filters-header">
       <div class="filters-title">
@@ -75,7 +74,6 @@
     </div>
   </div>
 
-  <!-- TABLE -->
   <div class="table-card">
     <div class="table-wrapper">
       <table class="main-table">
@@ -106,8 +104,7 @@
               <span class="tag {{ item.status }}">{{ item.status }}</span>
             </td>
             <td>
-              <button class="btn-view" (click)="verAdiantamento()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="btn-view" (click)="verAdiantamento(item.id)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
@@ -119,7 +116,6 @@
       </table>
     </div>
 
-    <!-- PAGINATION -->
     <div class="pagination" *ngIf="totalPaginas > 1">
       <button class="pagination-btn" [disabled]="pagina === 1" (click)="paginaAnterior()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

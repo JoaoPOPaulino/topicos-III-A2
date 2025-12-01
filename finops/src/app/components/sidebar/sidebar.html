@@ -1,14 +1,37 @@
 <aside class="sidebar" [class.show]="isOpen">
   <div class="sidebar-header">
-      <img src="assets/imgs/logo-com-nome.png" alt="FinOps Pro" class="sidebar-logo">
+    <img src="assets/imgs/logo-com-nome.png" alt="FinOps Pro" class="sidebar-logo">
   </div>
 
   <nav class="sidebar-menu">
-    <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">📊 Dashboard</a>
-    <a routerLink="/adiantamentos" routerLinkActive="active" class="menu-item">💸 Adiantamentos</a>
-    <a routerLink="/aprovacoes" routerLinkActive="active" class="menu-item">✔️ Aprovações</a>
-    <a routerLink="/conversor" routerLinkActive="active" class="menu-item">🌎 Conversor</a>
-    <a routerLink="/feriados" routerLinkActive="active" class="menu-item">📅 Feriados</a>
-    <a routerLink="/configuracoes" routerLinkActive="active" class="menu-item">⚙️ Configurações</a>
+    <a routerLink="/dashboard" 
+       routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}" 
+       class="menu-item">📊 Dashboard</a>
+    
+    <a routerLink="/adiantamentos" 
+       routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}" 
+       class="menu-item">💸 Adiantamentos</a>
+    
+    <a routerLink="/aprovacoes" 
+       routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}" 
+       class="menu-item">✔️ Aprovações</a>
+       
+    <a routerLink="/conversor" 
+       routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}" 
+       class="menu-item">🌎 Conversor</a>
+       
+    <a routerLink="/feriados" 
+       routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}" 
+       class="menu-item">📅 Feriados</a>
+       
+    <a routerLink="/configuracoes" 
+       routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}" 
+       class="menu-item">⚙️ Configurações</a>
   </nav>
 </aside>
