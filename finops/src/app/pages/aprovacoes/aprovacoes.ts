@@ -10,7 +10,7 @@ interface Approval {
   amount: number;
   currency: string;
   date: string;
-  status: 'Pendente' | 'Revisão' | 'Aprovado' | 'Rejeitado' | 'Pago' | 'Atrasado';
+  status: 'Pendente' | 'Revisão' | 'Aprovado' | 'Rejeitado' | 'Pago' | 'Atrasado' | 'Cancelado';
 }
 
 @Component({
@@ -64,7 +64,7 @@ export class Aprovacoes implements OnInit {
       amount: 40.0,
       currency: 'EUR',
       date: '2025-01-29',
-      status: 'Rejeitado',
+      status: 'Cancelado',
     },
     {
       id: 2005,
@@ -73,7 +73,7 @@ export class Aprovacoes implements OnInit {
       amount: 210.0,
       currency: 'EUR',
       date: '2025-01-28',
-      status: 'Pago',
+      status: 'Cancelado',
     },
     {
       id: 2006,
@@ -109,7 +109,7 @@ export class Aprovacoes implements OnInit {
       amount: 200.0,
       currency: 'USD',
       date: '2025-01-24',
-      status: 'Pago',
+      status: 'Rejeitado',
     },
     {
       id: 2010,

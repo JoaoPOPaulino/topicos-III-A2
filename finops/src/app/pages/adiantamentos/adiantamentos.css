@@ -165,7 +165,7 @@
 
 .input-with-icon svg {
   position: absolute;
-  left: 16px;
+  right: 16px;
   width: 18px;
   height: 18px;
   color: #6B7280;
@@ -315,14 +315,18 @@
 }
 
 .tag.Atrasado {
-  background: #fcdee0;
-  color: #E63946;
+  background: #ffe9d1;
+  color: #f59734;
 }
 
 .tag.Rejeitado {
   background: #fcdee0;
   color: #E63946;
   border: 1px solid #E63946;
+}
+
+.tag.Cancelado {
+  border: 1px solid black;
 }
 
 /* VIEW BUTTON */

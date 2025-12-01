@@ -80,7 +80,7 @@ export class Adiantamentos {
       valor: 'R$ 40,00',
       moeda: 'BRL',
       data: '2025-02-03',
-      status: 'Revisão',
+      status: 'Cancelado',
     },
     {
       id: 1008,
@@ -89,7 +89,7 @@ export class Adiantamentos {
       valor: '$ 200.00',
       moeda: 'USD',
       data: '2025-01-24',
-      status: 'Pago',
+      status: 'Cancelado',
     },
     {
       id: 1009,

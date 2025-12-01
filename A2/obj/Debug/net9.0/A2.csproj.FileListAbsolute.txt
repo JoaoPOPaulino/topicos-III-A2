@@ -425,3 +425,6 @@ C:\Users\joaop\Desktop\topicos-III-A2\A2\obj\Debug\net9.0\refint\A2.dll
 C:\Users\joaop\Desktop\topicos-III-A2\A2\obj\Debug\net9.0\A2.pdb
 C:\Users\joaop\Desktop\topicos-III-A2\A2\obj\Debug\net9.0\A2.genruntimeconfig.cache
 C:\Users\joaop\Desktop\topicos-III-A2\A2\obj\Debug\net9.0\ref\A2.dll
+C:\Users\Lucas Henderson\Documents\top3\topicos-III-A2\A2\obj\Debug\net9.0\A2.dll
+C:\Users\Lucas Henderson\Documents\top3\topicos-III-A2\A2\obj\Debug\net9.0\refint\A2.dll
+C:\Users\Lucas Henderson\Documents\top3\topicos-III-A2\A2\obj\Debug\net9.0\A2.pdb
