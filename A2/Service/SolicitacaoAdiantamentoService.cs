@@ -159,40 +159,51 @@ namespace A2.Services
         {
             _logger.LogInformation("Service: Buscando detalhes do Adiantamento ID {Id}.", id);
 
-            var result = await _context.SolicitacoesAdiantamento
+            // ✅ SOLUÇÃO: Buscar a entidade primeiro, depois mapear manualmente
+            var solicitacao = await _context.SolicitacoesAdiantamento
                 .Include(s => s.Colaborador)
                 .Include(s => s.Departamento)
                 .Include(s => s.Moeda)
-                .Include(s => s.CriadoPor) // Para obter o CriadoPorNome
-                .Where(s => s.Id == id)
-                .Select(s => new SolicitacaoAdiantamentoDetailDto
-                {
-                    // Campos da Listagem (Base)
-                    Id = s.Id,
-                    SolicitanteNome = s.Colaborador!.NomeCompleto,
-                    Descricao = s.Justificativa,
-                    Valor = s.Valor,
-                    MoedaCodigo = s.Moeda!.Codigo,
-                    ValorFormatado = $"{s.Moeda.Simbolo} {s.Valor:N2}",
-                    DataCriacao = s.CriadoEm,
-                    Status = s.Status,
-                    StatusDescricao = s.Status.ToString(),
+                .Include(s => s.CriadoPor)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
-                    // Campos específicos do Detalhe
-                    JustificativaCompleta = s.Justificativa,
-                    DepartamentoNome = s.Departamento!.Nome,
-                    DataPagamentoRequerida = s.DataPagamentoRequerida,
-                    DataPagamentoAjustada = s.DataPagamentoAjustada,
-                    Observacoes = s.Observacoes,
-                    CriadoPorNome = s.CriadoPor!.NomeCompleto,
-                    Anexos = new List<string> { "Recibo.pdf", "Comprovante.jpg" } // Mock
-                })
-                .FirstOrDefaultAsync();
-
-            if (result != null)
+            if (solicitacao == null)
             {
-                _logger.LogDebug("Service: Detalhes do Adiantamento ID {Id} encontrados no DB.", id);
+                _logger.LogWarning("Service: Adiantamento ID {Id} não encontrado.", id);
+                return null;
             }
+
+            // ✅ Mapeamento manual garante que todos os campos sejam preenchidos
+            var result = new SolicitacaoAdiantamentoDetailDto
+            {
+                // Campos da Base (SolicitacaoAdiantamentoListDto)
+                Id = solicitacao.Id,
+                SolicitanteNome = solicitacao.Colaborador!.NomeCompleto,
+                Descricao = solicitacao.Justificativa,
+                Valor = solicitacao.Valor,
+                MoedaCodigo = solicitacao.Moeda!.Codigo,
+                ValorFormatado = $"{solicitacao.Moeda.Simbolo} {solicitacao.Valor:N2}",
+                DataCriacao = solicitacao.CriadoEm,
+                Status = solicitacao.Status,
+                StatusDescricao = solicitacao.Status.ToString(),
+
+                // ✅ CRÍTICO: IDs para edição
+                ColaboradorId = solicitacao.ColaboradorId,
+                DepartamentoId = solicitacao.DepartamentoId,
+                MoedaId = solicitacao.MoedaId,
+
+                // Campos específicos do Detalhe
+                JustificativaCompleta = solicitacao.Justificativa,
+                DepartamentoNome = solicitacao.Departamento!.Nome,
+                DataPagamentoRequerida = solicitacao.DataPagamentoRequerida,
+                DataPagamentoAjustada = solicitacao.DataPagamentoAjustada,
+                Observacoes = solicitacao.Observacoes,
+                CriadoPorNome = solicitacao.CriadoPor!.NomeCompleto,
+                Anexos = new List<string> { "Recibo.pdf", "Comprovante.jpg" }
+            };
+
+            _logger.LogInformation("Service: Adiantamento ID {Id} encontrado. ColaboradorId={ColabId}, DepartamentoId={DeptId}, MoedaId={MoedaId}",
+                id, result.ColaboradorId, result.DepartamentoId, result.MoedaId);
 
             return result;
         }
