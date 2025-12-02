@@ -48,14 +48,26 @@ namespace A2.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
-            var solicitacao = await _service.GetByIdAsync(id);
+            _logger.LogInformation("GET /AdvanceRequests/{Id} recebido.", id);
 
-            if (solicitacao == null)
+            try
             {
-                return NotFound($"Solicitação ID {id} não encontrada.");
-            }
+                var solicitacao = await _service.GetByIdAsync(id);
 
-            return Ok(solicitacao);
+                if (solicitacao == null)
+                {
+                    _logger.LogWarning("Solicitação ID {Id} não encontrada.", id);
+                    return NotFound($"Solicitação ID {id} não encontrada.");
+                }
+
+                _logger.LogDebug("Detalhes do Adiantamento ID {Id} retornados com sucesso.", id);
+                return Ok(solicitacao);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro fatal ao buscar detalhes do Adiantamento ID {Id}.", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno ao buscar detalhes.");
+            }
         }
 
         [HttpPost]

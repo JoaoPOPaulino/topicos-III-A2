@@ -11,17 +11,16 @@ using System.Threading.Tasks;
 
 namespace A2.Services
 {
-    // A classe deve herdar de ISolicitacaoAdiantamentoService
     public class SolicitacaoAdiantamentoService : ISolicitacaoAdiantamentoService
     {
         private readonly ApplicationDbContext _context;
         private readonly IHolidayService _holidayService;
-        private readonly ILogger<SolicitacaoAdiantamentoService> _logger; // Assume que ILogger está injetado
+        private readonly ILogger<SolicitacaoAdiantamentoService> _logger;
 
         public SolicitacaoAdiantamentoService(
             ApplicationDbContext context,
             IHolidayService holidayService,
-            ILogger<SolicitacaoAdiantamentoService> logger) // Adicionado ILogger
+            ILogger<SolicitacaoAdiantamentoService> logger)
         {
             _context = context;
             _holidayService = holidayService;
@@ -33,17 +32,38 @@ namespace A2.Services
         // ---------------------------------------------------------------------
         public async Task<SolicitacaoAdiantamento> CreateAsync(SolicitacaoAdiantamentoCreateDto dto, int criadoPorId)
         {
+            _logger.LogInformation("Service: Tentativa de criação de adiantamento para Colab ID {ColabId}.", dto.ColaboradorId);
+
             // Validações...
             var colaboradorExiste = await _context.Usuarios
                 .AnyAsync(u => u.Id == dto.ColaboradorId && u.Ativo);
 
             if (!colaboradorExiste)
+            {
+                _logger.LogWarning("Colaborador ID {Id} não encontrado.", dto.ColaboradorId);
                 throw new InvalidOperationException("Colaborador não encontrado ou inativo.");
+            }
 
-            // ... (Validação de Adiantamento pendente e Data no passado)
+            // Validação de pendência (Simplificada)
+            var temAdiantamentoPendente = await _context.SolicitacoesAdiantamento
+                .AnyAsync(s => s.ColaboradorId == dto.ColaboradorId
+                             && (s.Status == StatusAdiantamento.Pendente
+                             || s.Status == StatusAdiantamento.Aprovado
+                             || s.Status == StatusAdiantamento.PrestacaoPendente));
+
+            if (temAdiantamentoPendente)
+            {
+                _logger.LogWarning("Criação falhou: Colaborador já possui adiantamento pendente.");
+                throw new InvalidOperationException("Colaborador possui adiantamento pendente (Pendente, Aprovado ou Prestação Pendente).");
+            }
+
+            if (dto.DataPagamentoRequerida.Date < DateTime.Today)
+                throw new InvalidOperationException("Data de pagamento não pode ser no passado.");
 
             // AÇÃO DE NEGÓCIO: Ajustar Data de Pagamento para o próximo dia útil
             var dataAjustada = await _holidayService.GetNextBusinessDayAsync(dto.DataPagamentoRequerida);
+            _logger.LogInformation("Data Requerida: {Req:d}, Data Ajustada (Feriados): {Adj:d}",
+                                    dto.DataPagamentoRequerida.Date, dataAjustada.Date);
 
             var solicitacao = new SolicitacaoAdiantamento
             {
@@ -62,6 +82,7 @@ namespace A2.Services
 
             _context.SolicitacoesAdiantamento.Add(solicitacao);
             await _context.SaveChangesAsync();
+            _logger.LogDebug("Solicitação ID {Id} salva no banco.", solicitacao.Id);
 
             await LogAuditoriaAsync(criadoPorId, "SolicitacaoAdiantamento", solicitacao.Id, "CREATE");
             return solicitacao;
@@ -69,7 +90,6 @@ namespace A2.Services
 
         private async Task LogAuditoriaAsync(int usuarioId, string entidade, int entidadeId, string acao)
         {
-            // Implementação LogAuditoria (simplificada)
             var log = new LogAuditoria
             {
                 UsuarioId = usuarioId,
@@ -78,7 +98,6 @@ namespace A2.Services
                 Acao = acao,
                 CriadoEm = DateTime.UtcNow
             };
-
             _context.LogsAuditoria.Add(log);
             await _context.SaveChangesAsync();
         }
@@ -88,13 +107,31 @@ namespace A2.Services
         // ---------------------------------------------------------------------
         public async Task<IEnumerable<SolicitacaoAdiantamentoListDto>> GetAllAsync(string? search, string? status, DateTime? dataInicial, DateTime? dataFinal)
         {
-            // Implementação de GetAllAsync (mantida)
             var query = _context.SolicitacoesAdiantamento
                 .Include(s => s.Colaborador)
                 .Include(s => s.Moeda)
                 .AsQueryable();
 
-            // ... (Lógica de filtragem) ...
+            // Lógica de filtragem
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(s => s.Justificativa.Contains(search)
+                                         || s.Colaborador!.NomeCompleto.Contains(search));
+            }
+
+            if (!string.IsNullOrEmpty(status) && Enum.TryParse<StatusAdiantamento>(status, true, out var statusEnum))
+            {
+                query = query.Where(s => s.Status == statusEnum);
+            }
+
+            if (dataInicial.HasValue)
+            {
+                query = query.Where(s => s.CriadoEm >= dataInicial.Value.Date);
+            }
+            if (dataFinal.HasValue)
+            {
+                query = query.Where(s => s.CriadoEm < dataFinal.Value.Date.AddDays(1));
+            }
 
             var results = await query
                 .OrderByDescending(s => s.CriadoEm)
@@ -108,7 +145,7 @@ namespace A2.Services
                     ValorFormatado = $"{s.Moeda.Simbolo} {s.Valor:N2}",
                     DataCriacao = s.CriadoEm,
                     Status = s.Status,
-                    StatusDescricao = s.Status.ToString(), // Usando ToString() para o nome do enum
+                    StatusDescricao = s.Status.ToString(),
                 })
                 .ToListAsync();
 
@@ -116,19 +153,21 @@ namespace A2.Services
         }
 
         // ---------------------------------------------------------------------
-        // R - READ (Detalhes - Usando o novo DTO)
+        // R - READ (Detalhes - Usando o DTO completo para visualização)
         // ---------------------------------------------------------------------
         public async Task<SolicitacaoAdiantamentoDetailDto?> GetByIdAsync(int id)
         {
+            _logger.LogInformation("Service: Buscando detalhes do Adiantamento ID {Id}.", id);
+
             var result = await _context.SolicitacoesAdiantamento
                 .Include(s => s.Colaborador)
                 .Include(s => s.Departamento)
                 .Include(s => s.Moeda)
-                // Usar ThenInclude para incluir a navegação de CriadoPor
-                .Include(s => s.CriadoPor)
+                .Include(s => s.CriadoPor) // Para obter o CriadoPorNome
                 .Where(s => s.Id == id)
-                .Select(s => new SolicitacaoAdiantamentoDetailDto // Usar o DTO de detalhe
+                .Select(s => new SolicitacaoAdiantamentoDetailDto
                 {
+                    // Campos da Listagem (Base)
                     Id = s.Id,
                     SolicitanteNome = s.Colaborador!.NomeCompleto,
                     Descricao = s.Justificativa,
@@ -139,7 +178,7 @@ namespace A2.Services
                     Status = s.Status,
                     StatusDescricao = s.Status.ToString(),
 
-                    // Campos específicos do Detail DTO
+                    // Campos específicos do Detalhe
                     JustificativaCompleta = s.Justificativa,
                     DepartamentoNome = s.Departamento!.Nome,
                     DataPagamentoRequerida = s.DataPagamentoRequerida,
@@ -149,6 +188,11 @@ namespace A2.Services
                     Anexos = new List<string> { "Recibo.pdf", "Comprovante.jpg" } // Mock
                 })
                 .FirstOrDefaultAsync();
+
+            if (result != null)
+            {
+                _logger.LogDebug("Service: Detalhes do Adiantamento ID {Id} encontrados no DB.", id);
+            }
 
             return result;
         }
@@ -170,18 +214,16 @@ namespace A2.Services
                 throw new InvalidOperationException("Apenas solicitações Pendentes ou em Revisão podem ser editadas.");
             }
 
-            // AÇÃO DE NEGÓCIO: Reajustar Data de Pagamento para o próximo dia útil
             var dataAjustada = await _holidayService.GetNextBusinessDayAsync(dto.DataPagamentoRequerida);
 
-            // Atualiza os campos:
             solicitacao.ColaboradorId = dto.ColaboradorId;
             solicitacao.Justificativa = dto.Justificativa;
             solicitacao.DepartamentoId = dto.DepartamentoId;
             solicitacao.MoedaId = dto.MoedaId;
             solicitacao.Valor = dto.Valor;
             solicitacao.DataPagamentoRequerida = dto.DataPagamentoRequerida;
-            solicitacao.DataPagamentoAjustada = dataAjustada; // Atualizado
-            solicitacao.Observacoes = dto.Observacoes; // Adicionado
+            solicitacao.DataPagamentoAjustada = dataAjustada;
+            solicitacao.Observacoes = dto.Observacoes;
             solicitacao.AtualizadoEm = DateTime.UtcNow;
 
             _context.SolicitacoesAdiantamento.Update(solicitacao);
@@ -206,8 +248,7 @@ namespace A2.Services
             solicitacao.Status = novoStatus;
             solicitacao.AtualizadoEm = DateTime.UtcNow;
 
-            int usuarioOperadorId = 1;
-            await LogAuditoriaAsync(usuarioOperadorId, "SolicitacaoAdiantamento", solicitacao.Id, $"STATUS_CHANGE_TO_{novoStatus.ToString().ToUpper()}");
+            await LogAuditoriaAsync(1, "SolicitacaoAdiantamento", solicitacao.Id, $"STATUS_CHANGE_TO_{novoStatus.ToString().ToUpper()}");
 
             _context.SolicitacoesAdiantamento.Update(solicitacao);
             await _context.SaveChangesAsync();
