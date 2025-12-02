@@ -75,7 +75,24 @@
     </div>
   </div>
 
-  <div class="table-card">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Carregando adiantamentos...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="errorMessage && !loading">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card" *ngIf="!loading">
     <div class="table-wrapper">
       <table class="main-table">
         <thead>
@@ -105,7 +122,8 @@
               <span class="tag {{ item.status }}">{{ item.status }}</span>
             </td>
             <td>
-              <button class="btn-view" (click)="verAdiantamento(item.id)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="btn-view" (click)="verAdiantamento(item.id)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
@@ -115,9 +133,20 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="paginaAtualizada.length === 0 && !loading && !errorMessage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <h3>Nenhum adiantamento encontrado</h3>
+        <p>Tente ajustar os filtros ou criar um novo adiantamento.</p>
+      </div>
     </div>
 
-    <div class="pagination" *ngIf="totalPaginas > 1">
+    <div class="pagination" *ngIf="totalPaginas > 1 && paginaAtualizada.length > 0">
       <button class="pagination-btn" [disabled]="pagina === 1" (click)="paginaAnterior()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="15 18 9 12 15 6"></polyline>

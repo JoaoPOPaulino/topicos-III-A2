@@ -1,48 +1,289 @@
-<form class="form-container" (ngSubmit)="salvar()">
+<section class="content">
 
-    <div class="form-group">
-        <label>Solicitante</label>
-        <select [(ngModel)]="form.colaboradorId" name="solicitante" required>
-            <option *ngFor="let colab of colaboradores" [ngValue]="colab.id">{{ colab.nomeCompleto }}</option>
-        </select>
+  <div class="page-header">
+    <div class="header-content">
+      <button class="btn-back" (click)="voltar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Voltar
+      </button>
+      <div class="title-area">
+        <div class="icon-title">
+          <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <h1 class="page-title">Novo Adiantamento</h1>
+        </div>
+        <p class="subtitle">Preencha as informações para criar um novo adiantamento</p>
+      </div>
     </div>
-    
-    <div class="form-group">
-        <label>Departamento</label>
-        <select [(ngModel)]="form.departamentoId" name="departamento" required>
-            <option *ngFor="let dept of departamentos" [ngValue]="dept.id">{{ dept.nome }}</option>
-        </select>
-    </div>
+  </div>
 
-    <div class="form-group">
-        <label>Descrição</label>
-        <input type="text" [(ngModel)]="form.justificativa" name="descricao" required placeholder="Descreva o motivo do adiantamento">
-    </div>
+  <!-- Success Alert -->
+  <div class="success-alert" *ngIf="showSuccessAlert">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span>Adiantamento criado com sucesso!</span>
+  </div>
 
-    <div class="row">
+  <form class="form-card" (ngSubmit)="salvar()">
+
+    <!-- Informações do Solicitante -->
+    <div class="form-section">
+      <div class="section-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <h2>Informações do Solicitante</h2>
+      </div>
+
+      <div class="form-grid">
+        <!-- Solicitante -->
         <div class="form-group">
-            <label>Valor</label>
-            <input type="text" name="valor" [(ngModel)]="form.valorMascarado" (input)="mascaraValor($event)" placeholder="R$ 0,00" required>
+          <label for="solicitante">
+            Solicitante
+            <span class="required">*</span>
+          </label>
+          
+          <select 
+            *ngIf="!showNewColaboradorInput"
+            id="solicitante"
+            [(ngModel)]="form.colaboradorId"
+            (change)="onColaboradorChange($event)"
+            name="solicitante" 
+            [class.invalid]="formErrors.colaboradorId"
+            required>
+            <option [ngValue]="0" disabled>Selecione um colaborador</option>
+            <option *ngFor="let colab of colaboradores" [ngValue]="colab.id">
+              {{ colab.nomeCompleto }}
+            </option>
+            <option value="novo" class="add-new-option">
+              ➕ Adicionar Novo Colaborador
+            </option>
+          </select>
+
+          <!-- Input para novo colaborador -->
+          <div *ngIf="showNewColaboradorInput" class="new-item-container">
+            <input 
+              type="text" 
+              [(ngModel)]="newColaboradorNome"
+              name="newColaborador"
+              placeholder="Digite o nome do novo colaborador"
+              class="new-item-input"
+              [disabled]="isLoading">
+            <div class="new-item-actions">
+              <button type="button" class="btn-confirm" (click)="adicionarColaborador()" [disabled]="isLoading">
+                <svg *ngIf="!isLoading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span class="spinner-tiny" *ngIf="isLoading"></span>
+              </button>
+              <button type="button" class="btn-cancel" (click)="cancelarNovoColaborador()" [disabled]="isLoading">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <span class="error-message" *ngIf="formErrors.colaboradorId">
+            Selecione um solicitante
+          </span>
+        </div>
+
+        <!-- Departamento -->
+        <div class="form-group">
+          <label for="departamento">
+            Departamento
+            <span class="required">*</span>
+          </label>
+          
+          <select 
+            *ngIf="!showNewDepartamentoInput"
+            id="departamento"
+            [(ngModel)]="form.departamentoId"
+            (change)="onDepartamentoChange($event)"
+            name="departamento" 
+            [class.invalid]="formErrors.departamentoId"
+            required>
+            <option [ngValue]="0" disabled>Selecione um departamento</option>
+            <option *ngFor="let dept of departamentos" [ngValue]="dept.id">
+              {{ dept.nome }}
+            </option>
+            <option value="novo" class="add-new-option">
+              ➕ Adicionar Novo Departamento
+            </option>
+          </select>
+
+          <!-- Input para novo departamento -->
+          <div *ngIf="showNewDepartamentoInput" class="new-item-container">
+            <input 
+              type="text" 
+              [(ngModel)]="newDepartamentoNome"
+              name="newDepartamento"
+              placeholder="Digite o nome do novo departamento"
+              class="new-item-input"
+              [disabled]="isLoading">
+            <div class="new-item-actions">
+              <button type="button" class="btn-confirm" (click)="adicionarDepartamento()" [disabled]="isLoading">
+                <svg *ngIf="!isLoading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span class="spinner-tiny" *ngIf="isLoading"></span>
+              </button>
+              <button type="button" class="btn-cancel" (click)="cancelarNovoDepartamento()" [disabled]="isLoading">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <span class="error-message" *ngIf="formErrors.departamentoId">
+            Selecione um departamento
+          </span>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="justificativa">
+            Justificativa
+            <span class="required">*</span>
+          </label>
+          <textarea 
+            id="justificativa"
+            [(ngModel)]="form.justificativa" 
+            name="justificativa"
+            [class.invalid]="formErrors.justificativa"
+            placeholder="Descreva o motivo do adiantamento"
+            rows="3"
+            required></textarea>
+          <span class="error-message" *ngIf="formErrors.justificativa">
+            Informe a justificativa
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Valores e Data -->
+    <div class="form-section">
+      <div class="section-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+        <h2>Valores e Data</h2>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="valor">
+            Valor
+            <span class="required">*</span>
+          </label>
+          <div class="input-with-prefix">
+            <span class="prefix">R$</span>
+            <input
+              id="valor"
+              type="text"
+              name="valor"
+              [(ngModel)]="form.valorMascarado"
+              (input)="mascaraValor($event)"
+              [class.invalid]="formErrors.valorMascarado"
+              placeholder="0,00"
+              required>
+          </div>
+          <span class="error-message" *ngIf="formErrors.valorMascarado">
+            Informe o valor
+          </span>
         </div>
 
         <div class="form-group">
-            <label>Moeda</label>
-            <select [(ngModel)]="form.moedaId" name="moeda">
-                <option *ngFor="let moeda of moedas" [ngValue]="moeda.id">{{ moeda.codigo }} - {{ moeda.simbolo }}</option>
-            </select>
+          <label for="moeda">
+            Moeda
+            <span class="required">*</span>
+          </label>
+          <select 
+            id="moeda"
+            [(ngModel)]="form.moedaId" 
+            name="moeda">
+            <option *ngFor="let moeda of moedas" [ngValue]="moeda.id">
+              {{ moeda.codigo }} - {{ moeda.simbolo }}
+            </option>
+          </select>
         </div>
 
         <div class="form-group">
-            <label>Data Requerida</label>
-            <input type="date" [(ngModel)]="form.dataPagamentoRequerida" name="data" required>
+          <label for="data">
+            Data de Pagamento Requerida
+            <span class="required">*</span>
+          </label>
+          <input 
+            id="data"
+            type="date" 
+            [(ngModel)]="form.dataPagamentoRequerida" 
+            name="data"
+            [class.invalid]="formErrors.dataPagamentoRequerida"
+            required>
+          <span class="error-message" *ngIf="formErrors.dataPagamentoRequerida">
+            Informe a data
+          </span>
         </div>
-    </div>
-    
-    <div class="form-group">
-        <label>Observações (opcional)</label>
-        <input type="text" [(ngModel)]="form.observacoes" name="observacoes" placeholder="Outras notas">
+      </div>
     </div>
 
-    <button class="btn-primary" type="submit">Salvar Adiantamento</button>
+    <!-- Observações Adicionais -->
+    <div class="form-section">
+      <div class="section-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <h2>Observações Adicionais</h2>
+      </div>
 
-</form>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="observacoes">Observações (opcional)</label>
+          <textarea 
+            id="observacoes"
+            [(ngModel)]="form.observacoes" 
+            name="observacoes" 
+            placeholder="Adicione outras informações relevantes"
+            rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="voltar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Cancelar
+      </button>
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <svg *ngIf="!isLoading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        <span class="spinner-small" *ngIf="isLoading"></span>
+        {{ isLoading ? 'Salvando...' : 'Criar Adiantamento' }}
+      </button>
+    </div>
+
+  </form>
+
+</section>

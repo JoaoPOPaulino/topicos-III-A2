@@ -14,7 +14,7 @@ interface AdvanceRequestCreateDto {
   observacoes: string | null;
 }
 
-interface AdvanceRequestDetailDto {
+interface AdvanceRequestListDto {
   id: number;
   solicitanteNome: string;
   descricao: string;
@@ -26,11 +26,20 @@ interface AdvanceRequestDetailDto {
   statusDescricao: string;
 }
 
+interface AdvanceRequestDetailDto extends AdvanceRequestListDto {
+  justificativaCompleta: string;
+  departamentoNome: string;
+  dataPagamentoRequerida: string;
+  dataPagamentoAjustada: string | null;
+  observacoes: string | null;
+  criadoPorNome: string;
+  anexos: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdvanceRequestService {
   private http = inject(HttpClient);
-  // Usamos HTTPS na porta 7244, pois o Login confirmou ser o protocolo correto
-  private baseUrl = 'https://localhost:7244/api/AdvanceRequests'; 
+  private baseUrl = 'https://localhost:7244/api/AdvanceRequests';
 
   // POST: Criar Novo Adiantamento
   createAdvanceRequest(dto: AdvanceRequestCreateDto): Observable<any> {
@@ -41,9 +50,9 @@ export class AdvanceRequestService {
   getAdvanceRequestById(id: number): Observable<AdvanceRequestDetailDto> {
     return this.http.get<AdvanceRequestDetailDto>(`${this.baseUrl}/${id}`);
   }
-  
+
   // GET: Obter Listagem (Corrigido para Limpeza de Parâmetros)
-  getAdvanceRequests(params?: any): Observable<AdvanceRequestDetailDto[]> {
+  getAdvanceRequests(params?: any): Observable<AdvanceRequestListDto[]> {
     let httpParams = new HttpParams();
 
     // Itera sobre os filtros e adiciona apenas valores válidos (não nulos/vazios)
@@ -57,6 +66,6 @@ export class AdvanceRequestService {
       }
     }
 
-    return this.http.get<AdvanceRequestDetailDto[]>(this.baseUrl, { params: httpParams });
+    return this.http.get<AdvanceRequestListDto[]>(this.baseUrl, { params: httpParams });
   }
 }

@@ -1,13 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { AdvanceRequestService } from '../../service/advence-request';
-
-// -----------------------------------------------------------
-// 1. Interfaces (Correspondem ao SolicitacaoAdiantamentoListDto do back-end)
-// -----------------------------------------------------------
 
 interface AdiantamentoItemDto {
   id: number;
@@ -16,194 +12,178 @@ interface AdiantamentoItemDto {
   valor: number;
   moedaCodigo: string;
   valorFormatado: string;
-  dataCriacao: string; 
-  statusDescricao: string; 
+  dataCriacao: string;
+  statusDescricao: string;
 }
 
-// Interface usada para exibição na tabela 
 interface AdiantamentoExibicao {
   id: number;
-  nome: string; // = solicitanteNome
-  desc: string; // = descricao
-  valor: string; // = valorFormatado
-  moeda: string; // = moedaCodigo
+  nome: string;
+  desc: string;
+  valor: string;
+  moeda: string;
   data: string;
-  status: string; // = statusDescricao
+  status: string;
 }
 
 @Component({
-  selector: 'app-adiantamentos',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule], 
-  templateUrl: './adiantamentos.html',
-  styleUrl: './adiantamentos.css',
+  selector: 'app-adiantamentos',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
+  templateUrl: './adiantamentos.html',
+  styleUrl: './adiantamentos.css',
 })
 export class Adiantamentos implements OnInit {
-  private router = inject(Router);
-  private advanceService = inject(AdvanceRequestService); 
+  private router = inject(Router);
+  private advanceService = inject(AdvanceRequestService);
+  private cdr = inject(ChangeDetectorRef); // ✨ ADICIONADO
 
-  sidebarOpen = false;
-  profileMenuOpen = false;
+  sidebarOpen = false;
+  profileMenuOpen = false;
   loading = false;
   errorMessage = '';
 
-  // Dados reais carregados da API
-  allRequests: AdiantamentoExibicao[] = []; 
+  allRequests: AdiantamentoExibicao[] = [];
 
-<<<<<<< HEAD
-  search = '';
-  status = '';
-  dataInicial = '';
-  dataFinal = '';
-=======
-    {
-      id: 1006,
-      nome: 'Eduardo Melo',
-      desc: 'Reunião SP',
-      valor: '€ 120,00',
-      moeda: 'EUR',
-      data: '2025-02-01',
-      status: 'Aprovado',
-    },
-    {
-      id: 1007,
-      nome: 'Bianca Souza',
-      desc: 'Uber',
-      valor: 'R$ 40,00',
-      moeda: 'BRL',
-      data: '2025-02-03',
-      status: 'Cancelado',
-    },
-    {
-      id: 1008,
-      nome: 'Ricardo Lima',
-      desc: 'Hospedagem',
-      valor: '$ 200.00',
-      moeda: 'USD',
-      data: '2025-01-24',
-      status: 'Cancelado',
-    },
-    {
-      id: 1009,
-      nome: 'Juliana Prado',
-      desc: 'Material Escritório',
-      valor: 'R$ 95,00',
-      moeda: 'BRL',
-      data: '2025-02-05',
-      status: 'Pendente',
-    },
-    {
-      id: 1010,
-      nome: 'Ana Souza',
-      desc: 'Passagem Aérea',
-      valor: '$ 540.00',
-      moeda: 'USD',
-      data: '2025-02-05',
-      status: 'Aprovado',
-    },
->>>>>>> ab2cb2bde64641de178c3bb1b26034c331979e47
+  search = '';
+  status = '';
+  dataInicial = '';
+  dataFinal = '';
 
-  pagina = 1;
-  itensPorPagina = 10;
-  paginaAtualizada: AdiantamentoExibicao[] = []; 
-  totalPaginas = 1;
+  pagina = 1;
+  itensPorPagina = 10;
+  paginaAtualizada: AdiantamentoExibicao[] = [];
+  totalPaginas = 1;
 
-  ngOnInit() {
-    this.loadRequests(); // Carrega os dados reais ao iniciar
-  }
+  private filterTimeout: any;
+  private isLoadingRequest = false;
 
-// -----------------------------------------------------------
-// 2. FUNÇÃO DE CARREGAMENTO (CHAMA A API COM FILTROS)
-// -----------------------------------------------------------
+  ngOnInit() {
+    console.log('ngOnInit chamado');
+    this.loadRequests();
+  }
 
-  loadRequests() {
-    this.loading = true;
+  loadRequests() {
+    if (this.isLoadingRequest) {
+      console.log('Já existe uma requisição em andamento');
+      return;
+    }
+
+    this.isLoadingRequest = true;
+    this.loading = true;
     this.errorMessage = '';
-    
-    // Mapear filtros Angular para parâmetros da API (serão limpos no serviço)
+    this.cdr.detectChanges(); // ✨ FORÇA ATUALIZAÇÃO DO LOADING
+
     const params = {
       search: this.search,
       status: this.status,
       dataInicial: this.dataInicial,
-      dataFinal: this.dataFinal
+      dataFinal: this.dataFinal,
     };
 
-    this.advanceService.getAdvanceRequests(params).subscribe({
-      next: (data: AdiantamentoItemDto[]) => {
-        // Mapeia o DTO do back-end para o formato de exibição 
-        this.allRequests = data.map(item => ({
-            id: item.id,
-            nome: item.solicitanteNome,
-            desc: item.descricao,
-            valor: item.valorFormatado, 
-            moeda: item.moedaCodigo,
-            data: item.dataCriacao,
-            status: item.statusDescricao, 
+    console.log('Carregando adiantamentos com params:', params);
+
+    this.advanceService.getAdvanceRequests(params).subscribe({
+      next: (data: AdiantamentoItemDto[]) => {
+        console.log('Dados recebidos:', data);
+
+        this.allRequests = data.map((item) => ({
+          id: item.id,
+          nome: item.solicitanteNome,
+          desc: item.descricao,
+          valor: item.valorFormatado,
+          moeda: item.moedaCodigo,
+          data: item.dataCriacao,
+          status: item.statusDescricao,
         }));
-        
-        this.loading = false;
-        this.totalPaginas = Math.ceil(this.allRequests.length / this.itensPorPagina);
-        this.filtrarPaginacao(this.allRequests); // Aplica a paginação
-      },
-      error: (err) => {
-        console.error('Erro ao carregar adiantamentos:', err);
-        this.loading = false;
-        if (err.status === 400) {
-            this.errorMessage = 'Erro de validação nos filtros (400 Bad Request).';
+
+        this.loading = false;
+        this.isLoadingRequest = false;
+        this.totalPaginas = Math.ceil(this.allRequests.length / this.itensPorPagina);
+        this.filtrarPaginacao(this.allRequests);
+
+        console.log('Página atualizada:', this.paginaAtualizada);
+
+        // ✨ FORÇA A DETECÇÃO DE MUDANÇAS
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao carregar adiantamentos:', err);
+        this.loading = false;
+        this.isLoadingRequest = false;
+
+        if (err.status === 0) {
+          this.errorMessage = 'Falha de conexão. Verifique se a API está rodando em HTTPS:7244.';
+        } else if (err.status === 400) {
+          this.errorMessage = 'Erro de validação nos filtros (400 Bad Request).';
         } else {
-            this.errorMessage = 'Não foi possível carregar a lista. Verifique a API.';
+          this.errorMessage = 'Não foi possível carregar a lista. Erro interno.';
         }
-      }
-    });
-  }
 
-// -----------------------------------------------------------
-// 3. LÓGICA DE FILTRAGEM E PAGINAÇÃO
-// -----------------------------------------------------------
-  
-  filtrar() {
-    this.loadRequests(); // Recarrega a lista com os filtros atualizados
-  }
-
-  filtrarPaginacao(requests: AdiantamentoExibicao[]) {
-    const inicio = (this.pagina - 1) * this.itensPorPagina;
-    const fim = inicio + this.itensPorPagina;
-    
-    this.paginaAtualizada = requests.slice(inicio, fim);
+        // ✨ FORÇA A DETECÇÃO DE MUDANÇAS NO ERRO TAMBÉM
+        this.cdr.detectChanges();
+      },
+    });
   }
 
-  atualizarPaginacao() {
+  filtrar() {
+    clearTimeout(this.filterTimeout);
+    this.filterTimeout = setTimeout(() => {
+      this.pagina = 1;
+      this.loadRequests();
+    }, 300);
+  }
+
+  filtrarPaginacao(requests: AdiantamentoExibicao[]) {
+    const inicio = (this.pagina - 1) * this.itensPorPagina;
+    const fim = inicio + this.itensPorPagina;
+
+    this.totalPaginas = Math.ceil(requests.length / this.itensPorPagina);
+    this.paginaAtualizada = requests.slice(inicio, fim);
+
+    console.log('filtrarPaginacao - itens na página:', this.paginaAtualizada.length);
+  }
+
+  atualizarPaginacao() {
     this.filtrarPaginacao(this.allRequests);
-  }
-  
-  paginaAnterior() {
-    if (this.pagina > 1) {
-      this.pagina--;
-      this.atualizarPaginacao();
-    }
-  }
+    this.cdr.detectChanges(); // ✨ FORÇA ATUALIZAÇÃO
+  }
 
-  paginaProxima() {
-    if (this.pagina < this.totalPaginas) {
-      this.pagina++;
-      this.atualizarPaginacao();
-    }
-  }
-  
-  limparFiltros() {
-    this.search = '';
-    this.status = '';
-    this.dataInicial = '';
-    this.dataFinal = '';
-    this.filtrar(); // Chama loadRequests
-  }
+  paginaAnterior() {
+    if (this.pagina > 1) {
+      this.pagina--;
+      this.atualizarPaginacao();
+    }
+  }
 
-  novoAdiantamento() {
-    this.router.navigate(['/novo-adiantamento']);
-  }
+  paginaProxima() {
+    if (this.pagina < this.totalPaginas) {
+      this.pagina++;
+      this.atualizarPaginacao();
+    }
+  }
 
-  // Passar o ID (ainda não implementado no HTML, mas pronto aqui)
-  verAdiantamento(id: number) {
-    this.router.navigate(['/ver-adiantamento'], { queryParams: { id: id } }); 
-  }
+  limparFiltros() {
+    this.search = '';
+    this.status = '';
+    this.dataInicial = '';
+    this.dataFinal = '';
+    clearTimeout(this.filterTimeout);
+    this.pagina = 1;
+    this.loadRequests();
+  }
+
+  novoAdiantamento() {
+    this.router.navigate(['/novo-adiantamento']);
+  }
+
+  verAdiantamento(id: number) {
+    this.router.navigate(['/ver-adiantamento'], { queryParams: { id: id } });
+  }
+
+  ngOnDestroy() {
+    if (this.filterTimeout) {
+      clearTimeout(this.filterTimeout);
+    }
+  }
 }
