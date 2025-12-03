@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService, UserData } from '../../service/auth';
 
 @Component({
   selector: 'app-topbar',
@@ -8,7 +9,22 @@ import { RouterLink } from '@angular/router';
   styleUrl: './topbar.css',
 })
 export class Topbar {
-  @Output() toggleSidebar = new EventEmitter<void>(); // Avisa o pai para abrir/fechar sidebar
-  isMenuOpen = false; // Controla o dropdown
-}
+  @Output() toggleSidebar = new EventEmitter<void>();
+  isMenuOpen = false;
 
+  firstName: string = '';
+
+  constructor(private authService: AuthService) {}
+
+  ngOnInit() {
+    const user: UserData | null = this.authService.getUser();
+
+    if (user && user.nomeCompleto) {
+      this.firstName = user.nomeCompleto.split(' ')[0]; // pega só o primeiro nome
+    }
+  }
+
+  logout() {
+    this.authService.logout();
+  }
+}
