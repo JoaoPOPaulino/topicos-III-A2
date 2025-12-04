@@ -38,7 +38,7 @@ namespace A2.Services
             if (adiantamento == null)
                 throw new KeyNotFoundException($"Solicitação de Adiantamento ID {dto.SolicitacaoAdiantamentoId} não encontrada.");
 
-            if (adiantamento.Status != StatusAdiantamento.Pago && adiantamento.Status != StatusAdiantamento.PrestacaoPendente)
+            if (adiantamento.Status != StatusAdiantamento.Pago && adiantamento.Status != StatusAdiantamento.Pendente)
                 throw new InvalidOperationException($"A prestação só pode ser criada para adiantamentos em status PAGO ou PRESTACAO PENDENTE. Status atual: {adiantamento.Status}.");
 
             var existingReport = await _context.PrestacoesContas

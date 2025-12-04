@@ -16,6 +16,6 @@ namespace A2.DTOs
         public string CriadoPorNome { get; set; } = string.Empty;
 
     
-        public List<string> Anexos { get; set; } = new List<string> { "Recibo1.pdf", "NotaHotel.png" };
+        public List<string> Anexos { get; set; } = new List<string> { };
     }
 }

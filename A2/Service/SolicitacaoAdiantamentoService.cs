@@ -48,8 +48,7 @@ namespace A2.Services
             var temAdiantamentoPendente = await _context.SolicitacoesAdiantamento
                 .AnyAsync(s => s.ColaboradorId == dto.ColaboradorId
                              && (s.Status == StatusAdiantamento.Pendente
-                             || s.Status == StatusAdiantamento.Aprovado
-                             || s.Status == StatusAdiantamento.PrestacaoPendente));
+                             || s.Status == StatusAdiantamento.Aprovado));
 
             if (temAdiantamentoPendente)
             {
@@ -220,7 +219,7 @@ namespace A2.Services
                 throw new KeyNotFoundException($"Solicitação de Adiantamento com ID {id} não encontrada.");
             }
 
-            if (solicitacao.Status != StatusAdiantamento.Pendente && solicitacao.Status != StatusAdiantamento.EmRevisao)
+            if (solicitacao.Status != StatusAdiantamento.Pendente && solicitacao.Status != StatusAdiantamento.Revisao)
             {
                 throw new InvalidOperationException("Apenas solicitações Pendentes ou em Revisão podem ser editadas.");
             }

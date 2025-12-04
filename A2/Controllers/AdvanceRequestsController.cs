@@ -77,6 +77,9 @@ namespace A2.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // ✅ CORRIGIDO: Removi o "id" que não existe aqui
+                _logger.LogWarning("Modelo de DTO inválido para POST. Erros: {Errors}",
+                    ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList());
                 return BadRequest(ModelState);
             }
 
@@ -102,57 +105,76 @@ namespace A2.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Modelo de DTO inválido para PUT ID {Id}. Erros: {Errors}",
+                    id, ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList());
                 return BadRequest(ModelState);
             }
 
             try
             {
                 await _service.UpdateAsync(id, dto);
+                _logger.LogInformation("✅ Adiantamento ID {Id} atualizado com sucesso.", id);
                 return NoContent();
             }
             catch (KeyNotFoundException)
             {
+                _logger.LogWarning("Solicitação ID {Id} não encontrada para atualização.", id);
                 return NotFound($"Solicitação ID {id} não encontrada.");
             }
             catch (InvalidOperationException ex)
             {
-                
+                _logger.LogWarning("Operação inválida ao atualizar ID {Id}: {Message}", id, ex.Message);
                 return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao atualizar adiantamento.");
+                _logger.LogError(ex, "Erro ao atualizar adiantamento ID {Id}.", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno ao atualizar a solicitação.");
             }
         }
 
+        // ✅ CORRIGIDO: Aceita int no query parameter
         [HttpPatch("{id}/status")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ChangeStatus(int id, [FromQuery] string newStatus)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ChangeStatus(int id, [FromQuery] int newStatus)
         {
-            if (!Enum.TryParse<StatusAdiantamento>(newStatus, true, out var statusEnum))
+            _logger.LogInformation("PATCH /AdvanceRequests/{Id}/status recebido. Novo status: {Status}", id, newStatus);
+
+            // ✅ Valida se o int recebido é um valor válido do enum
+            if (!Enum.IsDefined(typeof(StatusAdiantamento), newStatus))
             {
-                return BadRequest("Status inválido.");
+                _logger.LogWarning("Status {Status} inválido para ID {Id}.", newStatus, id);
+                return BadRequest($"Status {newStatus} inválido. Valores aceitos: 1-8.");
             }
+
+            var statusEnum = (StatusAdiantamento)newStatus;
 
             try
             {
                 await _service.ChangeStatusAsync(id, statusEnum);
+                _logger.LogInformation("✅ Status do Adiantamento ID {Id} alterado para {Status}.", id, statusEnum);
                 return NoContent();
             }
             catch (KeyNotFoundException)
             {
+                _logger.LogWarning("Solicitação ID {Id} não encontrada para mudança de status.", id);
                 return NotFound($"Solicitação ID {id} não encontrada.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao alterar status do adiantamento ID {Id}.", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno ao alterar status.");
             }
         }
 
         [HttpGet("TestRate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> TestExchangeRate(
-            [FromQuery] int moedaBaseId = 1, // BRL
-            [FromQuery] int moedaCotadaId = 2, // USD
-            [FromQuery] string data = "2023-01-01") // Data Antiga para garantir cache/busca
+            [FromQuery] int moedaBaseId = 1,
+            [FromQuery] int moedaCotadaId = 2,
+            [FromQuery] string data = "2023-01-01")
         {
             if (!DateTime.TryParse(data, out var dataCambiaria))
             {
@@ -162,7 +184,6 @@ namespace A2.Controllers
             try
             {
                 var rate = await _exchangeRateService.GetRateAsync(moedaBaseId, moedaCotadaId, dataCambiaria);
-
                 return Ok(new
                 {
                     MoedaBaseId = moedaBaseId,
@@ -178,7 +199,6 @@ namespace A2.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                // Inclui falhas de API ou deserialização
                 _logger.LogError(ex, "Erro na API de Câmbio.");
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
@@ -190,12 +210,8 @@ namespace A2.Controllers
         {
             try
             {
-                // Usar data atual para evitar muitas chamadas à API
                 var hoje = DateTime.Today;
-
-                // Testar com BRL para USD (mais comum)
                 var rate = await _exchangeRateService.GetRateAsync(1, 2, hoje);
-
                 return Ok(new
                 {
                     MoedaBase = "BRL",

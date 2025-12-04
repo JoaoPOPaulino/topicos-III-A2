@@ -3,14 +3,12 @@
     public enum StatusAdiantamento
     {
         Pendente = 1,
-        Aprovado = 2,
-        Reprovado = 3,
-        Pago = 4,
-        PrestacaoPendente = 5,
-        PrestacaoEnviada = 6,
-        PrestacaoAprovada = 7,
+        Revisao = 2,
+        Aprovado = 3,
+        Atrasado = 4,
+        Rejeitado = 5,
+        Pago = 6,
+        PrestacaoEnviada = 7,
         Finalizado = 8,
-        Cancelado = 9,
-        EmRevisao = 10
     }
 }
