@@ -71,4 +71,9 @@ export class AdvanceRequestService {
   updateAdvanceRequest(id: number, dto: AdvanceRequestCreateDto): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}`, dto);
   }
+
+  changeStatus(id: number, newStatus: number): Observable<void> {
+        const params = new HttpParams().set('newStatus', newStatus); 
+        return this.http.patch<void>(`${this.baseUrl}/${id}/status`, null, { params });
+    }
 }

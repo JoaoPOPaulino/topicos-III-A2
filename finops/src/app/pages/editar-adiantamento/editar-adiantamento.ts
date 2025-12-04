@@ -6,7 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AdvanceRequestService } from '../../service/advence-request';
 import { DataService } from '../../service/data';
 
-interface AdvanceRequestCreateDto {
+interface AdvanceRequestUpdateDto {
   colaboradorId: number;
   departamentoId: number;
   moedaId: number;
@@ -14,6 +14,24 @@ interface AdvanceRequestCreateDto {
   justificativa: string;
   dataPagamentoRequerida: string;
   observacoes: string | null;
+}
+
+interface StatusOption {
+  value: number;
+  label: string;
+}
+
+interface AdvanceRequestDetailsDto {
+  colaboradorId: number;
+  departamentoId: number;
+  moedaId: number;
+  valorFormatado: string; 
+  justificativaCompleta: string;
+  descricao: string;
+  dataPagamentoRequerida: string;
+  observacoes: string | null;
+  statusDescricao: string;
+  status: number;
 }
 
 @Component({
@@ -47,18 +65,20 @@ export class EditarAdiantamento implements OnInit {
     { value: 'outros', label: 'Outros' },
   ];
   
-  statusOptions = [
-    { value: 'Pendente', label: 'Pendente' },
-    { value: 'Revisão', label: 'Revisão' },
-    { value: 'Aprovado', label: 'Aprovado' },
-    { value: 'Atrasado', label: 'Atrasado' },
-    { value: 'Rejeitado', label: 'Rejeitado' },
-    { value: 'Pago', label: 'Pago' },
-    { value: 'PrestacaoEnviada', label: 'Prestação Enviada' }, 
-    { value: 'Finalizado', label: 'Finalizado' },
+  // ✅ CORRETO: Sincronizado com o enum do C#
+  statusOptions: StatusOption[] = [
+    { value: 1, label: 'Pendente' },              // Pendente = 1
+    { value: 2, label: 'Em Revisão' },            // Revisao = 2
+    { value: 3, label: 'Aprovado' },              // Aprovado = 3
+    { value: 4, label: 'Atrasado' },              // Atrasado = 4
+    { value: 5, label: 'Rejeitado' },             // Rejeitado = 5
+    { value: 6, label: 'Pago' },                  // Pago = 6
+    { value: 7, label: 'Prestação Enviada' },     // PrestacaoEnviada = 7
+    { value: 8, label: 'Finalizado' },            // Finalizado = 8
   ];
 
   adiantamentoId: number | null = null;
+  originalStatus: number | null = null; 
 
   adiantamentoForm = this.fb.group({
     colaboradorId: [null as number | null, Validators.required],
@@ -69,22 +89,14 @@ export class EditarAdiantamento implements OnInit {
     dataPagamentoRequerida: ['', Validators.required],
     observacoes: [''],
     categoria: ['transporte', Validators.required], 
-    status: ['Pendente'],
+    status: [1 as number, Validators.required], 
   });
   
   ngOnInit(): void {
-    console.log('🚀 EditarAdiantamento - ngOnInit chamado');
-    
     this.route.queryParams.subscribe(params => {
       const id = params['id'];
-      console.log('📋 Query Params:', params);
-      console.log('🆔 ID recebido:', id);
-      
       if (id) {
         this.adiantamentoId = Number(id);
-        console.log('🔢 Adiantamento ID convertido:', this.adiantamentoId);
-        
-        // Carrega lookups PRIMEIRO, depois carrega os detalhes
         this.loadLookupDataThenDetails();
       } else {
         alert('ID do adiantamento não fornecido.');
@@ -94,106 +106,65 @@ export class EditarAdiantamento implements OnInit {
   }
 
   loadLookupDataThenDetails(): void {
-    console.log('📦 Iniciando carregamento de lookups...');
-    
     let lookupsLoaded = 0;
     const totalLookups = 3;
 
     const checkAllLoaded = () => {
       lookupsLoaded++;
-      console.log(`✅ Lookup carregado (${lookupsLoaded}/${totalLookups})`);
-      
-      if (lookupsLoaded === totalLookups) {
-        console.log('🎉 Todos os lookups carregados! Agora carregando detalhes...');
-        this.loadAdiantamentoDetails(this.adiantamentoId!);
+      if (lookupsLoaded === totalLookups && this.adiantamentoId) {
+        this.loadAdiantamentoDetails(this.adiantamentoId);
       }
     };
 
-    // Carrega moedas
     this.dataService.getCurrencies().subscribe({
-      next: (data) => {
-        this.moedas = data;
-        console.log('💰 Moedas carregadas:', this.moedas);
-        checkAllLoaded();
-      },
-      error: (err) => {
-        console.error('❌ Erro ao carregar moedas:', err);
-        checkAllLoaded(); // Continua mesmo com erro
-      }
+      next: (data) => { this.moedas = data; checkAllLoaded(); },
+      error: (err) => { console.error('❌ Erro ao carregar moedas:', err); checkAllLoaded(); }
     });
     
-    // Carrega colaboradores
     this.dataService.getUsers().subscribe({
-      next: (data) => {
-        this.colaboradores = data;
-        console.log('👥 Colaboradores carregados:', this.colaboradores);
-        checkAllLoaded();
-      },
-      error: (err) => {
-        console.error('❌ Erro ao carregar colaboradores:', err);
-        checkAllLoaded();
-      }
+      next: (data) => { this.colaboradores = data; checkAllLoaded(); },
+      error: (err) => { console.error('❌ Erro ao carregar colaboradores:', err); checkAllLoaded(); }
     });
     
-    // Carrega departamentos
     this.dataService.getDepartments().subscribe({
-      next: (data) => {
-        this.departamentos = data;
-        console.log('🏢 Departamentos carregados:', this.departamentos);
-        checkAllLoaded();
-      },
-      error: (err) => {
-        console.error('❌ Erro ao carregar departamentos:', err);
-        checkAllLoaded();
-      }
+      next: (data) => { this.departamentos = data; checkAllLoaded(); },
+      error: (err) => { console.error('❌ Erro ao carregar departamentos:', err); checkAllLoaded(); }
     });
   }
 
   loadAdiantamentoDetails(id: number): void {
-    console.log(`🔍 Iniciando carregamento dos detalhes do adiantamento ID ${id}...`);
     this.loading = true;
     
     this.advanceService.getAdvanceRequestById(id).subscribe({
-      next: (data: any) => {
-        console.log('📄 Dados COMPLETOS recebidos do backend:', JSON.stringify(data, null, 2));
-        
-        // ✅ VERIFICAÇÃO CRÍTICA - Imprime cada campo individualmente
-        console.log('🔎 Verificação individual dos campos:');
-        console.log('  - colaboradorId:', data.colaboradorId, '(tipo:', typeof data.colaboradorId, ')');
-        console.log('  - departamentoId:', data.departamentoId, '(tipo:', typeof data.departamentoId, ')');
-        console.log('  - moedaId:', data.moedaId, '(tipo:', typeof data.moedaId, ')');
-        console.log('  - valorFormatado:', data.valorFormatado);
-        console.log('  - dataPagamentoRequerida:', data.dataPagamentoRequerida);
-        console.log('  - justificativaCompleta:', data.justificativaCompleta);
-        console.log('  - observacoes:', data.observacoes);
-        console.log('  - statusDescricao:', data.statusDescricao);
-        
-        // Limpa o valorFormatado
+      next: (data: AdvanceRequestDetailsDto) => {
         let valorLimpo = '';
         if (data.valorFormatado) {
           valorLimpo = data.valorFormatado
             .replace(/[^\d,]/g, '')
             .replace(/\./g, '');
-          console.log('💵 Valor formatado limpo:', valorLimpo);
         }
         
-        // ✅ CONVERSÃO EXPLÍCITA para garantir que são números
         const colaboradorIdNum = data.colaboradorId ? Number(data.colaboradorId) : null;
         const departamentoIdNum = data.departamentoId ? Number(data.departamentoId) : null;
         const moedaIdNum = data.moedaId ? Number(data.moedaId) : null;
         
-        console.log('🔢 IDs convertidos para número:');
-        console.log('  - colaboradorId:', colaboradorIdNum);
-        console.log('  - departamentoId:', departamentoIdNum);
-        console.log('  - moedaId:', moedaIdNum);
-        
-        // Extrai apenas a data (YYYY-MM-DD)
         const dataPagamento = data.dataPagamentoRequerida 
           ? data.dataPagamentoRequerida.split('T')[0] 
           : '';
-        console.log('📅 Data de pagamento extraída:', dataPagamento);
+
+        let statusLoadedNumber = 1;
         
-        // ✅ PREENCHE O FORMULÁRIO
+        if (data.status) {
+          statusLoadedNumber = data.status;
+        } else if (data.statusDescricao) {
+          const statusMatch = this.statusOptions.find(opt => 
+            opt.label.toLowerCase().replace(/\s/g, '') === data.statusDescricao.toLowerCase().replace(/\s/g, '')
+          );
+          statusLoadedNumber = statusMatch ? statusMatch.value : 1;
+        }
+
+        this.originalStatus = statusLoadedNumber;
+        
         this.adiantamentoForm.patchValue({
           colaboradorId: colaboradorIdNum,
           departamentoId: departamentoIdNum,
@@ -202,29 +173,16 @@ export class EditarAdiantamento implements OnInit {
           dataPagamentoRequerida: dataPagamento,
           justificativa: data.justificativaCompleta || data.descricao || '',
           observacoes: data.observacoes || '',
-          status: data.statusDescricao || 'Pendente',
+          status: statusLoadedNumber,
           categoria: 'transporte',
         });
 
-        console.log('✅ Formulário preenchido. Valores atuais:');
-        console.log(JSON.stringify(this.adiantamentoForm.value, null, 2));
-        
-        console.log('🎯 Estado de validade dos campos:');
-        console.log('  - colaboradorId válido?', !this.adiantamentoForm.get('colaboradorId')?.invalid);
-        console.log('  - departamentoId válido?', !this.adiantamentoForm.get('departamentoId')?.invalid);
-        console.log('  - moedaId válido?', !this.adiantamentoForm.get('moedaId')?.invalid);
-        
         this.loading = false;
-        console.log('✅ Loading finalizado com sucesso!');
       },
       error: (err) => {
         console.error('❌ ERRO ao carregar adiantamento:', err);
-        console.error('📊 Status do erro:', err.status);
-        console.error('📝 Mensagem do erro:', err.message);
-        console.error('🔍 Detalhes completos:', JSON.stringify(err, null, 2));
-        
         this.loading = false;
-        alert(`Erro ao carregar adiantamento: ${err.status || 'Desconhecido'} - ${err.message || 'Sem mensagem'}`);
+        alert(`Erro ao carregar adiantamento: ${err.status || 'Desconhecido'}`);
         this.voltar();
       }
     });
@@ -264,29 +222,17 @@ export class EditarAdiantamento implements OnInit {
   }
 
   submit(): void {
-    console.log('📤 Submit chamado!');
-    console.log('📋 Valores do formulário:', this.adiantamentoForm.value);
-    console.log('✅ Formulário válido?', this.adiantamentoForm.valid);
-    console.log('🆔 Adiantamento ID:', this.adiantamentoId);
-    
     if (this.adiantamentoForm.invalid || this.adiantamentoId === null) {
       this.adiantamentoForm.markAllAsTouched();
-      console.log('❌ Formulário inválido!');
-      console.log('🔍 Erros por campo:');
-      Object.keys(this.adiantamentoForm.controls).forEach(key => {
-        const control = this.adiantamentoForm.get(key);
-        if (control?.invalid) {
-          console.log(`  - ${key}: INVÁLIDO`, control.errors);
-        }
-      });
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
+    this.loading = true;
     const formValue = this.adiantamentoForm.value;
     const observacoesValor = formValue.observacoes === '' ? null : (formValue.observacoes || null);
     
-    const dto: AdvanceRequestCreateDto = {
+    const dto: AdvanceRequestUpdateDto = {
       colaboradorId: formValue.colaboradorId!,
       departamentoId: formValue.departamentoId!,
       moedaId: formValue.moedaId!,
@@ -296,30 +242,55 @@ export class EditarAdiantamento implements OnInit {
       observacoes: observacoesValor,
     };
     
-    console.log('📦 DTO montado para envio:', JSON.stringify(dto, null, 2));
-    
-    this.loading = true;
     this.advanceService.updateAdvanceRequest(this.adiantamentoId, dto).subscribe({
       next: () => {
-        console.log(`✅ Adiantamento ID ${this.adiantamentoId} atualizado com sucesso!`);
-        this.loading = false;
-        this.showSuccessAlert = true;
-        setTimeout(() => {
-          this.showSuccessAlert = false;
-          this.voltar();
-        }, 2000);
+        const newStatusNumber = formValue.status!;
+
+        if (newStatusNumber !== this.originalStatus) { 
+          this.advanceService.changeStatus(this.adiantamentoId!, newStatusNumber).subscribe({
+            next: () => this.finalizeSubmit(),
+            error: (err) => this.handleError(err, 'Falha ao atualizar o status.')
+          });
+        } else {
+          this.finalizeSubmit();
+        }
       },
-      error: (err) => {
-        console.error('❌ Erro ao atualizar adiantamento:', err);
-        this.loading = false;
-        const msg = err.error?.message || err.message || 'Erro ao comunicar com o servidor.';
-        alert(`Falha na atualização: ${msg}`);
-      }
+      error: (err) => this.handleError(err, 'Falha ao atualizar dados.')
     });
   }
 
+  private finalizeSubmit(): void {
+    this.loading = false;
+    this.showSuccessAlert = true;
+    setTimeout(() => {
+      this.showSuccessAlert = false;
+      this.voltar();
+    }, 2000);
+  }
+
+  private handleError(err: any, defaultMsg: string): void {
+    this.loading = false;
+    
+    let msg = defaultMsg;
+    
+    if (err.status === 400 && err.error && typeof err.error === 'object') {
+      const modelStateErrors = Object.values(err.error)
+        .flatMap((x: any) => x)
+        .filter((item: any) => typeof item === 'string' && item.length > 0);
+      
+      if (modelStateErrors.length > 0) {
+        msg = `Falha de Validação: ${modelStateErrors.join('; ')}`;
+      } else {
+        msg = err.error?.message || msg;
+      }
+    } else {
+      msg = err.error?.message || err.message || msg;
+    }
+    
+    alert(`${msg} (Status: ${err.status || 'Desconhecido'})`);
+  }
+
   voltar(): void {
-    console.log('⬅️ Voltando...');
     this.location.back();
   }
 

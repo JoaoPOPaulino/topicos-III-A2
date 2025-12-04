@@ -63,7 +63,7 @@
               id="colaboradorId" 
               formControlName="colaboradorId"
               [class.error]="isFieldInvalid('colaboradorId')">
-              <option [ngValue]="null" disabled selected>Selecione o Solicitante</option>
+              <option [ngValue]="null" disabled>Selecione o Solicitante</option>
               <option *ngFor="let colab of colaboradores" [ngValue]="colab.id">
                 {{ colab.nomeCompleto }}
               </option>
@@ -83,7 +83,7 @@
               id="departamentoId" 
               formControlName="departamentoId"
               [class.error]="isFieldInvalid('departamentoId')">
-              <option [ngValue]="null" disabled selected>Selecione o Departamento</option>
+              <option [ngValue]="null" disabled>Selecione o Departamento</option>
               <option *ngFor="let dept of departamentos" [ngValue]="dept.id">
                 {{ dept.nome }}
               </option>
@@ -154,7 +154,7 @@
               id="moedaId" 
               formControlName="moedaId"
               [class.error]="isFieldInvalid('moedaId')">
-              <option [ngValue]="null" disabled selected>Selecione a Moeda</option>
+              <option [ngValue]="null" disabled>Selecione a Moeda</option>
               <option *ngFor="let moeda of moedas" [ngValue]="moeda.id">
                 {{ moeda.codigo }} - {{ moeda.nome }}
               </option>
@@ -213,11 +213,9 @@
 
           <!-- Status -->
           <div class="form-field">
-            <label for="status">
-              Status
-            </label>
+            <label for="status">Status</label>
             <select id="status" formControlName="status">
-              <option *ngFor="let st of statusOptions" [value]="st.value">
+              <option *ngFor="let st of statusOptions" [ngValue]="st.value">
                 {{ st.label }}
               </option>
             </select>
