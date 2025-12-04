@@ -161,9 +161,11 @@ export class Aprovacoes implements OnInit {
     this.loadApprovals();
   }
 
-  verAdiantamento(): void {
-    this.router.navigate(['/ver-adiantamento']);
-  }
+  verAdiantamento(id: number): void {
+  this.router.navigate(['/ver-adiantamento'], {
+    queryParams: { id: id }
+  });
+}
 
   goToEdit(id: number): void { 
     this.router.navigate(['/editar-adiantamento'], { 
