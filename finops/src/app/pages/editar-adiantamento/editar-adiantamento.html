@@ -1,247 +1,298 @@
 <section class="content">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
 
-  <div class="page-header">
-    <div class="header-content">
+  <!-- Content quando não está loading -->
+  <div *ngIf="!loading">
+    <!-- Header com botão voltar -->
+    <div class="page-header">
       <button class="btn-back" (click)="voltar()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
         Voltar
       </button>
-      <div class="title-area">
-        <div class="icon-title">
-          <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+    </div>
+
+    <!-- Título -->
+    <div class="title-section">
+      <div class="icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="page-title">Editar Adiantamento</h1>
+        <p class="page-subtitle">Atualize as informações do adiantamento</p>
+      </div>
+    </div>
+
+    <!-- Success Alert -->
+    <div class="success-alert" *ngIf="showSuccessAlert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span>Adiantamento atualizado com sucesso!</span>
+    </div>
+
+    <!-- Formulário -->
+    <form class="form-container" [formGroup]="adiantamentoForm" (ngSubmit)="submit()">
+      
+      <!-- Seção: Informações Básicas -->
+      <div class="form-card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
           </svg>
-          <h1 class="page-title">Editar Adiantamento</h1>
+          <h2>Informações Básicas</h2>
         </div>
-        <p class="subtitle">Atualize as informações do adiantamento</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Success Alert -->
-  <div class="success-alert" *ngIf="showSuccessAlert">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
-    <span>Adiantamento atualizado com sucesso!</span>
-  </div>
-
-  <form class="form-card" [formGroup]="adiantamentoForm" (ngSubmit)="submit()">
-
-    <!-- Informações Básicas -->
-    <div class="form-section">
-      <div class="section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <h2>Informações Básicas</h2>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-group full-width">
-          <label for="solicitante">
-            Solicitante
-            <span class="required">*</span>
-          </label>
-          <input 
-            id="solicitante" 
-            type="text" 
-            formControlName="solicitante"
-            [class.invalid]="isFieldInvalid('solicitante')"
-            placeholder="Nome do solicitante">
-          <span class="error-message" *ngIf="isFieldInvalid('solicitante')">
-            Campo obrigatório
-          </span>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="descricao">
-            Descrição
-            <span class="required">*</span>
-          </label>
-          <textarea 
-            id="descricao" 
-            formControlName="descricao"
-            [class.invalid]="isFieldInvalid('descricao')"
-            placeholder="Descreva o motivo do adiantamento"
-            rows="3"></textarea>
-          <span class="error-message" *ngIf="isFieldInvalid('descricao')">
-            Campo obrigatório
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Valores e Data -->
-    <div class="form-section">
-      <div class="section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="1" x2="12" y2="23"></line>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-        </svg>
-        <h2>Valores e Data</h2>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="valor">
-            Valor
-            <span class="required">*</span>
-          </label>
-          <div class="input-with-prefix">
-            <span class="prefix">R$</span>
-            <input
-              id="valor"
-              type="text"
-              formControlName="valor"
-              (input)="onValorInput($event)"
-              [class.invalid]="isFieldInvalid('valor')"
-              placeholder="0,00">
+        
+        <div class="card-body">
+          <!-- Solicitante -->
+          <div class="form-field">
+            <label for="colaboradorId">
+              Solicitante
+              <span class="required">*</span>
+            </label>
+            <select 
+              id="colaboradorId" 
+              formControlName="colaboradorId"
+              [class.error]="isFieldInvalid('colaboradorId')">
+              <option [ngValue]="null" disabled>Selecione o Solicitante</option>
+              <option *ngFor="let colab of colaboradores" [ngValue]="colab.id">
+                {{ colab.nomeCompleto }}
+              </option>
+            </select>
+            <span class="error-text" *ngIf="isFieldInvalid('colaboradorId')">
+              Campo obrigatório
+            </span>
           </div>
-          <span class="error-message" *ngIf="isFieldInvalid('valor')">
-            Campo obrigatório
-          </span>
-        </div>
 
-        <div class="form-group">
-          <label for="moeda">
-            Moeda
-            <span class="required">*</span>
-          </label>
-          <select id="moeda" formControlName="moeda" [class.invalid]="isFieldInvalid('moeda')">
-            <option *ngFor="let moeda of moedas" [value]="moeda.value">{{ moeda.label }}</option>
-          </select>
-          <span class="error-message" *ngIf="isFieldInvalid('moeda')">
-            Campo obrigatório
-          </span>
-        </div>
+          <!-- Departamento -->
+          <div class="form-field">
+            <label for="departamentoId">
+              Departamento
+              <span class="required">*</span>
+            </label>
+            <select 
+              id="departamentoId" 
+              formControlName="departamentoId"
+              [class.error]="isFieldInvalid('departamentoId')">
+              <option [ngValue]="null" disabled>Selecione o Departamento</option>
+              <option *ngFor="let dept of departamentos" [ngValue]="dept.id">
+                {{ dept.nome }}
+              </option>
+            </select>
+            <span class="error-text" *ngIf="isFieldInvalid('departamentoId')">
+              Campo obrigatório
+            </span>
+          </div>
 
-        <div class="form-group">
-          <label for="data">
-            Data
-            <span class="required">*</span>
-          </label>
-          <input 
-            id="data" 
-            type="date" 
-            formControlName="data"
-            [class.invalid]="isFieldInvalid('data')">
-          <span class="error-message" *ngIf="isFieldInvalid('data')">
-            Campo obrigatório
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Categoria e Status -->
-    <div class="form-section">
-      <div class="section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <h2>Categoria e Status</h2>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="categoria">
-            Categoria
-            <span class="required">*</span>
-          </label>
-          <select id="categoria" formControlName="categoria" [class.invalid]="isFieldInvalid('categoria')">
-            <option *ngFor="let cat of categorias" [value]="cat.value">{{ cat.label }}</option>
-          </select>
-          <span class="error-message" *ngIf="isFieldInvalid('categoria')">
-            Campo obrigatório
-          </span>
-        </div>
-
-        <div class="form-group">
-          <label for="status">
-            Status
-            <span class="required">*</span>
-          </label>
-          <select id="status" formControlName="status" [class.invalid]="isFieldInvalid('status')">
-            <option *ngFor="let st of statusOptions" [value]="st.value">{{ st.label }}</option>
-          </select>
-          <span class="error-message" *ngIf="isFieldInvalid('status')">
-            Campo obrigatório
-          </span>
+          <!-- Justificativa -->
+          <div class="form-field full-width">
+            <label for="justificativa">
+              Justificativa/Descrição
+              <span class="required">*</span>
+            </label>
+            <textarea 
+              id="justificativa" 
+              formControlName="justificativa"
+              [class.error]="isFieldInvalid('justificativa')"
+              placeholder="Descreva o motivo do adiantamento"
+              rows="4"></textarea>
+            <span class="error-text" *ngIf="isFieldInvalid('justificativa')">
+              Campo obrigatório
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="form-group full-width">
-        <label for="justificativa">Justificativa (opcional)</label>
-        <textarea 
-          id="justificativa" 
-          formControlName="justificativa"
-          placeholder="Adicione observações ou justificativas adicionais"
-          rows="3"></textarea>
-      </div>
-    </div>
-
-    <!-- Anexos -->
-    <div class="form-section">
-      <div class="section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-        </svg>
-        <h2>Anexos</h2>
-      </div>
-
-      <div class="file-upload-area">
-        <input 
-          type="file" 
-          id="anexo" 
-          formControlName="anexo" 
-          (change)="onFileChange($event)"
-          multiple
-          class="file-input">
-        <label for="anexo" class="file-label">
+      <!-- Seção: Valores e Data -->
+      <div class="form-card">
+        <div class="card-header">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
           </svg>
-          <span class="upload-text">
-            <strong>Clique para fazer upload</strong> ou arraste arquivos aqui
-          </span>
-          <span class="upload-hint">PDF, PNG, JPG até 10MB</span>
-        </label>
-        <div class="selected-file" *ngIf="selectedFileName">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-            <polyline points="13 2 13 9 20 9"></polyline>
-          </svg>
-          <span>{{ selectedFileName }}</span>
+          <h2>Valores e Data</h2>
+        </div>
+        
+        <div class="card-body">
+          <!-- Valor -->
+          <div class="form-field">
+            <label for="valor">
+              Valor
+              <span class="required">*</span>
+            </label>
+            <div class="input-prefix">
+              <span class="prefix-text">R$</span>
+              <input
+                id="valor"
+                type="text"
+                formControlName="valor"
+                (input)="onValorInput($event)"
+                [class.error]="isFieldInvalid('valor')"
+                placeholder="0,00">
+            </div>
+            <span class="error-text" *ngIf="isFieldInvalid('valor')">
+              Campo obrigatório
+            </span>
+          </div>
+
+          <!-- Moeda -->
+          <div class="form-field">
+            <label for="moedaId">
+              Moeda
+              <span class="required">*</span>
+            </label>
+            <select 
+              id="moedaId" 
+              formControlName="moedaId"
+              [class.error]="isFieldInvalid('moedaId')">
+              <option [ngValue]="null" disabled>Selecione a Moeda</option>
+              <option *ngFor="let moeda of moedas" [ngValue]="moeda.id">
+                {{ moeda.codigo }} - {{ moeda.nome }}
+              </option>
+            </select>
+            <span class="error-text" *ngIf="isFieldInvalid('moedaId')">
+              Campo obrigatório
+            </span>
+          </div>
+
+          <!-- Data Requerida -->
+          <div class="form-field">
+            <label for="dataPagamentoRequerida">
+              Data Requerida
+              <span class="required">*</span>
+            </label>
+            <input 
+              id="dataPagamentoRequerida" 
+              type="date" 
+              formControlName="dataPagamentoRequerida"
+              [class.error]="isFieldInvalid('dataPagamentoRequerida')">
+            <span class="error-text" *ngIf="isFieldInvalid('dataPagamentoRequerida')">
+              Campo obrigatório
+            </span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Ações -->
-    <div class="form-actions">
-      <button type="button" class="btn-secondary" (click)="voltar()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-        Cancelar
-      </button>
-      <button type="submit" class="btn-primary">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-          <polyline points="17 21 17 13 7 13 7 21"></polyline>
-          <polyline points="7 3 7 8 15 8"></polyline>
-        </svg>
-        Salvar Alterações
-      </button>
-    </div>
+      <!-- Seção: Categoria e Status -->
+      <div class="form-card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+          <h2>Categoria e Status</h2>
+        </div>
+        
+        <div class="card-body">
+          <!-- Categoria -->
+          <div class="form-field">
+            <label for="categoria">
+              Categoria (Mock)
+              <span class="required">*</span>
+            </label>
+            <select 
+              id="categoria" 
+              formControlName="categoria"
+              [class.error]="isFieldInvalid('categoria')">
+              <option *ngFor="let cat of categorias" [value]="cat.value">
+                {{ cat.label }}
+              </option>
+            </select>
+            <span class="error-text" *ngIf="isFieldInvalid('categoria')">
+              Campo obrigatório
+            </span>
+          </div>
 
-  </form>
+          <!-- Status -->
+          <div class="form-field">
+            <label for="status">Status</label>
+            <select id="status" formControlName="status">
+              <option *ngFor="let st of statusOptions" [ngValue]="st.value">
+                {{ st.label }}
+              </option>
+            </select>
+          </div>
 
+          <!-- Observações -->
+          <div class="form-field full-width">
+            <label for="observacoes">Observações (opcional)</label>
+            <textarea 
+              id="observacoes" 
+              formControlName="observacoes"
+              placeholder="Adicione observações ou justificativas adicionais"
+              rows="4"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção: Anexos -->
+      <div class="form-card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+          </svg>
+          <h2>Anexos</h2>
+        </div>
+        
+        <div class="card-body">
+          <div class="upload-area">
+            <input 
+              type="file" 
+              id="fileInput" 
+              (change)="onFileChange($event)"
+              multiple
+              class="file-input"
+              accept=".pdf,.png,.jpg,.jpeg">
+            <label for="fileInput" class="upload-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <div class="upload-texts">
+                <p class="upload-main"><strong>Clique para fazer upload</strong> ou arraste arquivos aqui</p>
+                <p class="upload-hint">PDF, PNG, JPG até 10MB</p>
+              </div>
+            </label>
+            
+            <div class="file-selected" *ngIf="selectedFileName">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                <polyline points="13 2 13 9 20 9"/>
+              </svg>
+              <span>{{ selectedFileName }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botões de Ação -->
+      <div class="action-buttons">
+        <button type="button" class="btn btn-cancel" (click)="voltar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-save" [disabled]="loading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Salvar Alterações
+        </button>
+      </div>
+
+    </form>
+  </div>
 </section>

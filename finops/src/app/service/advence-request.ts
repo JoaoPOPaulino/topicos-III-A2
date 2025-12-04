@@ -1,9 +1,8 @@
 // src/app/services/advance-request.service.ts
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http'; // Adicionado HttpParams
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// DTOs (Mantidos)
 interface AdvanceRequestCreateDto {
   colaboradorId: number;
   departamentoId: number;
@@ -27,6 +26,11 @@ interface AdvanceRequestListDto {
 }
 
 interface AdvanceRequestDetailDto extends AdvanceRequestListDto {
+  // ✨ ADICIONADO: IDs para edição
+  colaboradorId: number;
+  departamentoId: number;
+  moedaId: number;
+  
   justificativaCompleta: string;
   departamentoNome: string;
   dataPagamentoRequerida: string;
@@ -41,25 +45,20 @@ export class AdvanceRequestService {
   private http = inject(HttpClient);
   private baseUrl = 'https://localhost:7244/api/AdvanceRequests';
 
-  // POST: Criar Novo Adiantamento
   createAdvanceRequest(dto: AdvanceRequestCreateDto): Observable<any> {
     return this.http.post(this.baseUrl, dto);
   }
 
-  // GET: Obter Detalhes por ID
   getAdvanceRequestById(id: number): Observable<AdvanceRequestDetailDto> {
     return this.http.get<AdvanceRequestDetailDto>(`${this.baseUrl}/${id}`);
   }
 
-  // GET: Obter Listagem (Corrigido para Limpeza de Parâmetros)
   getAdvanceRequests(params?: any): Observable<AdvanceRequestListDto[]> {
     let httpParams = new HttpParams();
 
-    // Itera sobre os filtros e adiciona apenas valores válidos (não nulos/vazios)
     if (params) {
       for (const key in params) {
         const value = params[key];
-        // Exclui 'undefined', null, ou string vazia
         if (value !== null && value !== undefined && value !== '') {
           httpParams = httpParams.set(key, value.toString());
         }
@@ -68,4 +67,13 @@ export class AdvanceRequestService {
 
     return this.http.get<AdvanceRequestListDto[]>(this.baseUrl, { params: httpParams });
   }
+
+  updateAdvanceRequest(id: number, dto: AdvanceRequestCreateDto): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${id}`, dto);
+  }
+
+  changeStatus(id: number, newStatus: number): Observable<void> {
+        const params = new HttpParams().set('newStatus', newStatus); 
+        return this.http.patch<void>(`${this.baseUrl}/${id}/status`, null, { params });
+    }
 }
