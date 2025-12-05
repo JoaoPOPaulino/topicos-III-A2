@@ -42,7 +42,7 @@ namespace A2.Services
                 throw new InvalidOperationException($"A prestação só pode ser criada para adiantamentos em status PAGO ou PRESTACAO PENDENTE. Status atual: {adiantamento.Status}.");
 
             var existingReport = await _context.PrestacoesContas
-                .AnyAsync(p => p.SolicitacaoAdiantamentoId == dto.SolicitacaoAdiantamentoId && p.Status != StatusPrestacao.Finalizada);
+                .AnyAsync(p => p.SolicitacaoAdiantamentoId == dto.SolicitacaoAdiantamentoId && p.Status != StatusAdiantamento.Finalizado);
 
             if (existingReport)
                 throw new InvalidOperationException("Já existe uma prestação de contas ativa para este adiantamento.");
@@ -52,7 +52,7 @@ namespace A2.Services
             {
                 SolicitacaoAdiantamentoId = dto.SolicitacaoAdiantamentoId,
                 CriadoPorId = criadoPorId,
-                Status = StatusPrestacao.Enviada,
+                Status = StatusAdiantamento.Aprovado,
                 EnviadoEm = DateTime.UtcNow,
                 Despesas = new List<Despesa>()
             };
