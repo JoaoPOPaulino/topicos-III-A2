@@ -6,184 +6,184 @@ import { HttpClientModule } from '@angular/common/http';
 import { AdvanceRequestService } from '../../service/advence-request';
 
 interface AdiantamentoItemDto {
-  id: number;
-  solicitanteNome: string;
-  descricao: string;
-  valor: number;
-  moedaCodigo: string;
-  valorFormatado: string;
-  dataCriacao: string;
-  statusDescricao: string;
+  id: number;
+  solicitanteNome: string;
+  descricao: string;
+  valor: number;
+  moedaCodigo: string;
+  valorFormatado: string;
+  dataCriacao: string;
+  statusDescricao: string;
 }
 
 interface AdiantamentoExibicao {
-  id: number;
-  nome: string;
-  desc: string;
-  valor: string;
-  moeda: string;
-  data: string;
-  status: string;
+  id: number;
+  nome: string;
+  desc: string;
+  valor: string;
+  moeda: string;
+  data: string;
+  status: string;
 }
 
 @Component({
-  selector: 'app-adiantamentos',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
-  templateUrl: './adiantamentos.html',
-  styleUrl: './adiantamentos.css',
+  selector: 'app-adiantamentos',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
+  templateUrl: './adiantamentos.html',
+  styleUrl: './adiantamentos.css',
 })
 export class Adiantamentos implements OnInit {
-  private router = inject(Router);
-  private advanceService = inject(AdvanceRequestService);
-  private cdr = inject(ChangeDetectorRef); // ✨ ADICIONADO
+  private router = inject(Router);
+  private advanceService = inject(AdvanceRequestService);
+  private cdr = inject(ChangeDetectorRef);
 
-  sidebarOpen = false;
-  profileMenuOpen = false;
-  loading = false;
-  errorMessage = '';
+  sidebarOpen = false;
+  profileMenuOpen = false;
+  loading = false;
+  errorMessage = '';
 
-  allRequests: AdiantamentoExibicao[] = [];
+  allRequests: AdiantamentoExibicao[] = [];
 
-  search = '';
-  status = '';
-  dataInicial = '';
-  dataFinal = '';
+  search = '';
+  // ✅ PADRÃO: Mostrar apenas Pendente na aba Adiantamentos
+  status = 'Pendente'; 
+  dataInicial = '';
+  dataFinal = '';
 
-  pagina = 1;
-  itensPorPagina = 10;
-  paginaAtualizada: AdiantamentoExibicao[] = [];
-  totalPaginas = 1;
+  pagina = 1;
+  itensPorPagina = 10;
+  paginaAtualizada: AdiantamentoExibicao[] = [];
+  totalPaginas = 1;
 
-  private filterTimeout: any;
-  private isLoadingRequest = false;
+  private filterTimeout: any;
+  private isLoadingRequest = false;
 
-  ngOnInit() {
-    console.log('ngOnInit chamado');
-    this.loadRequests();
-  }
+  ngOnInit() {
+    console.log('ngOnInit chamado. Status padrão: Pendente');
+    this.loadRequests();
+  }
 
-  loadRequests() {
-    if (this.isLoadingRequest) {
-      console.log('Já existe uma requisição em andamento');
-      return;
-    }
+  loadRequests() {
+    if (this.isLoadingRequest) {
+      console.log('Já existe uma requisição em andamento');
+      return;
+    }
 
-    this.isLoadingRequest = true;
-    this.loading = true;
-    this.errorMessage = '';
-    this.cdr.detectChanges(); // ✨ FORÇA ATUALIZAÇÃO DO LOADING
+    this.isLoadingRequest = true;
+    this.loading = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
 
-    const params = {
-      search: this.search,
-      status: this.status,
-      dataInicial: this.dataInicial,
-      dataFinal: this.dataFinal,
-    };
+    const params = {
+      search: this.search,
+      status: this.status, // ✅ Envia o status 'Pendente' (ou outro filtro)
+      dataInicial: this.dataInicial,
+      dataFinal: this.dataFinal,
+    };
 
-    console.log('Carregando adiantamentos com params:', params);
+    console.log('Carregando adiantamentos com params:', params);
 
-    this.advanceService.getAdvanceRequests(params).subscribe({
-      next: (data: AdiantamentoItemDto[]) => {
-        console.log('Dados recebidos:', data);
+    this.advanceService.getAdvanceRequests(params).subscribe({
+      next: (data: AdiantamentoItemDto[]) => {
+        console.log('Dados recebidos:', data);
 
-        this.allRequests = data.map((item) => ({
-          id: item.id,
-          nome: item.solicitanteNome,
-          desc: item.descricao,
-          valor: item.valorFormatado,
-          moeda: item.moedaCodigo,
-          data: item.dataCriacao,
-          status: item.statusDescricao,
-        }));
+        this.allRequests = data.map((item) => ({
+          id: item.id,
+          nome: item.solicitanteNome,
+          desc: item.descricao,
+          valor: item.valorFormatado,
+          moeda: item.moedaCodigo,
+          data: item.dataCriacao,
+          status: item.statusDescricao,
+        }));
 
-        this.loading = false;
-        this.isLoadingRequest = false;
-        this.totalPaginas = Math.ceil(this.allRequests.length / this.itensPorPagina);
-        this.filtrarPaginacao(this.allRequests);
+        this.loading = false;
+        this.isLoadingRequest = false;
+        this.totalPaginas = Math.ceil(this.allRequests.length / this.itensPorPagina);
+        this.filtrarPaginacao(this.allRequests);
 
-        console.log('Página atualizada:', this.paginaAtualizada);
+        console.log('Página atualizada:', this.paginaAtualizada);
 
-        // ✨ FORÇA A DETECÇÃO DE MUDANÇAS
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Erro ao carregar adiantamentos:', err);
-        this.loading = false;
-        this.isLoadingRequest = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('❌ Erro ao carregar adiantamentos:', err);
+        this.loading = false;
+        this.isLoadingRequest = false;
 
-        if (err.status === 0) {
-          this.errorMessage = 'Falha de conexão. Verifique se a API está rodando em HTTPS:7244.';
-        } else if (err.status === 400) {
-          this.errorMessage = 'Erro de validação nos filtros (400 Bad Request).';
-        } else {
-          this.errorMessage = 'Não foi possível carregar a lista. Erro interno.';
-        }
+        if (err.status === 0) {
+          this.errorMessage = 'Falha de conexão. Verifique se a API está rodando em HTTPS:7244.';
+        } else if (err.status === 400) {
+          this.errorMessage = 'Erro de validação nos filtros (400 Bad Request).';
+        } else {
+          this.errorMessage = 'Não foi possível carregar a lista. Erro interno.';
+        }
 
-        // ✨ FORÇA A DETECÇÃO DE MUDANÇAS NO ERRO TAMBÉM
-        this.cdr.detectChanges();
-      },
-    });
-  }
+        this.cdr.detectChanges();
+      },
+    });
+  }
 
-  filtrar() {
-    clearTimeout(this.filterTimeout);
-    this.filterTimeout = setTimeout(() => {
-      this.pagina = 1;
-      this.loadRequests();
-    }, 300);
-  }
+  filtrar() {
+    clearTimeout(this.filterTimeout);
+    this.filterTimeout = setTimeout(() => {
+      this.pagina = 1;
+      this.loadRequests();
+    }, 300);
+  }
 
-  filtrarPaginacao(requests: AdiantamentoExibicao[]) {
-    const inicio = (this.pagina - 1) * this.itensPorPagina;
-    const fim = inicio + this.itensPorPagina;
+  filtrarPaginacao(requests: AdiantamentoExibicao[]) {
+    const inicio = (this.pagina - 1) * this.itensPorPagina;
+    const fim = inicio + this.itensPorPagina;
 
-    this.totalPaginas = Math.ceil(requests.length / this.itensPorPagina);
-    this.paginaAtualizada = requests.slice(inicio, fim);
+    this.totalPaginas = Math.ceil(requests.length / this.itensPorPagina);
+    this.paginaAtualizada = requests.slice(inicio, fim);
 
-    console.log('filtrarPaginacao - itens na página:', this.paginaAtualizada.length);
-  }
+    console.log('filtrarPaginacao - itens na página:', this.paginaAtualizada.length);
+  }
 
-  atualizarPaginacao() {
-    this.filtrarPaginacao(this.allRequests);
-    this.cdr.detectChanges(); // ✨ FORÇA ATUALIZAÇÃO
-  }
+  atualizarPaginacao() {
+    this.filtrarPaginacao(this.allRequests);
+    this.cdr.detectChanges();
+  }
 
-  paginaAnterior() {
-    if (this.pagina > 1) {
-      this.pagina--;
-      this.atualizarPaginacao();
-    }
-  }
+  paginaAnterior() {
+    if (this.pagina > 1) {
+      this.pagina--;
+      this.atualizarPaginacao();
+    }
+  }
 
-  paginaProxima() {
-    if (this.pagina < this.totalPaginas) {
-      this.pagina++;
-      this.atualizarPaginacao();
-    }
-  }
+  paginaProxima() {
+    if (this.pagina < this.totalPaginas) {
+      this.pagina++;
+      this.atualizarPaginacao();
+    }
+  }
 
-  limparFiltros() {
-    this.search = '';
-    this.status = '';
-    this.dataInicial = '';
-    this.dataFinal = '';
-    clearTimeout(this.filterTimeout);
-    this.pagina = 1;
-    this.loadRequests();
-  }
+  limparFiltros() {
+    this.search = '';
+    // ✅ Garante que o status volte para 'Pendente' após limpar
+    this.status = 'Pendente'; 
+    this.dataInicial = '';
+    this.dataFinal = '';
+    clearTimeout(this.filterTimeout);
+    this.pagina = 1;
+    this.loadRequests();
+  }
 
-  novoAdiantamento() {
-    this.router.navigate(['/novo-adiantamento']);
-  }
+  novoAdiantamento() {
+    this.router.navigate(['/novo-adiantamento']);
+  }
 
-  verAdiantamento(id: number) {
-    this.router.navigate(['/ver-adiantamento'], { queryParams: { id: id } });
-  }
+  verAdiantamento(id: number) {
+    this.router.navigate(['/ver-adiantamento'], { queryParams: { id: id } });
+  }
 
-  ngOnDestroy() {
-    if (this.filterTimeout) {
-      clearTimeout(this.filterTimeout);
-    }
-  }
+  ngOnDestroy() {
+    if (this.filterTimeout) {
+      clearTimeout(this.filterTimeout);
+    }
+  }
 }

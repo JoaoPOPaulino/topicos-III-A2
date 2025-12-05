@@ -28,7 +28,7 @@
         </svg>
         <span>Filtros</span>
       </div>
-      <button class="btn-clear-filters" (click)="limparFiltros()" *ngIf="search || status || dataInicial || dataFinal">
+      <button class="btn-clear-filters" (click)="limparFiltros()" *ngIf="search || status !== 'Pendente' || dataInicial || dataFinal">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -52,14 +52,7 @@
       <div class="filter-group">
         <label>Status</label>
         <select [(ngModel)]="status" (change)="filtrar()">
-          <option value="">Todos</option>
-          <option value="Pendente">Pendente</option>
-          <option value="Revisão">Revisão</option>
-          <option value="Aprovado">Aprovado</option>
-          <option value="Pago">Pago</option>
-          <option value="Atrasado">Atrasado</option>
-          <option value="Rejeitado">Rejeitado</option>
-          <option value="Cancelado">Cancelado</option>
+          <option value="Pendente">Pendente</option> 
         </select>
       </div>
 
@@ -75,13 +68,11 @@
     </div>
   </div>
 
-  <!-- Loading Overlay -->
   <div class="loading-overlay" *ngIf="loading">
     <div class="spinner"></div>
     <p>Carregando adiantamentos...</p>
   </div>
 
-  <!-- Error Message -->
   <div class="error-message" *ngIf="errorMessage && !loading">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="10"></circle>
@@ -91,7 +82,6 @@
     <span>{{ errorMessage }}</span>
   </div>
 
-  <!-- Table Card -->
   <div class="table-card" *ngIf="!loading">
     <div class="table-wrapper">
       <table class="main-table">
@@ -134,7 +124,6 @@
         </tbody>
       </table>
 
-      <!-- Empty State -->
       <div class="empty-state" *ngIf="paginaAtualizada.length === 0 && !loading && !errorMessage">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"></circle>
