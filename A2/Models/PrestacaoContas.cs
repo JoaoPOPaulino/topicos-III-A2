@@ -16,7 +16,7 @@ namespace A2.Models
         public int CriadoPorId { get; set; }
         public Usuario? CriadoPor { get; set; }
 
-        public StatusPrestacao Status { get; set; } = StatusPrestacao.EmElaboracao;
+        public StatusAdiantamento Status { get; set; } = StatusAdiantamento.Revisao;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalDespesas { get; set; }

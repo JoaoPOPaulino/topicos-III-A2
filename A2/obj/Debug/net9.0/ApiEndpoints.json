@@ -371,6 +371,66 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "A2.Controllers.DashboardController",
+    "Method": "GetRecentActivities",
+    "RelativePath": "api/Dashboard/activities",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[A2.DTOs.Dashboard.DashboardActivityDto, A2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "A2.Controllers.DashboardController",
+    "Method": "GetChartData",
+    "RelativePath": "api/Dashboard/charts",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "A2.DTOs.Dashboard.DashboardChartDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "A2.Controllers.DashboardController",
+    "Method": "GetStats",
+    "RelativePath": "api/Dashboard/stats",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "A2.DTOs.Dashboard.DashboardStatsDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "A2.Controllers.DataController",
     "Method": "GetCurrenciesLookup",
     "RelativePath": "api/Data/Currencies",

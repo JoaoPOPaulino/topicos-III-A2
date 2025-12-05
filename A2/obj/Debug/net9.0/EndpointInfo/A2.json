@@ -529,6 +529,102 @@
         }
       }
     },
+    "/api/Dashboard/stats": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStatsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStatsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStatsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Dashboard/activities": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardActivityDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardActivityDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardActivityDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Dashboard/charts": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardChartDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardChartDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardChartDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Data/Users": {
       "get": {
         "tags": [
@@ -737,6 +833,28 @@
   },
   "components": {
     "schemas": {
+      "ChartDataPoint": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ConversionHistoryDto": {
         "type": "object",
         "properties": {
@@ -787,6 +905,119 @@
           "nomeCompleto": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DashboardActivityDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "userName": {
+            "type": "string",
+            "nullable": true
+          },
+          "action": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "timeAgo": {
+            "type": "string",
+            "nullable": true
+          },
+          "relatedEntityId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DashboardChartDto": {
+        "type": "object",
+        "properties": {
+          "adiantamentosPorStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChartDataPoint"
+            },
+            "nullable": true
+          },
+          "despesasPorCategoria": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChartDataPoint"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DashboardStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalAdiantamentosPendentes": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAdiantamentosPendentesFormatado": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantidadeAdiantamentosPendentes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "despesasEmRevisao": {
+            "type": "number",
+            "format": "double"
+          },
+          "despesasEmRevisaoFormatado": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantidadeDespesasEmRevisao": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pagamentosAtrasados": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "economiaMensal": {
+            "type": "number",
+            "format": "double"
+          },
+          "economiaMensalFormatado": {
+            "type": "string",
+            "nullable": true
+          },
+          "trendAdiantamentos": {
+            "type": "number",
+            "format": "double"
+          },
+          "trendDespesas": {
+            "type": "number",
+            "format": "double"
+          },
+          "trendPagamentos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "trendEconomia": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -961,6 +1192,9 @@
     },
     {
       "name": "Conversor"
+    },
+    {
+      "name": "Dashboard"
     },
     {
       "name": "Data"
