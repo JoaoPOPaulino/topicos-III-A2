@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AdvanceRequestService } from '../../service/advence-request';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -25,8 +25,9 @@ interface ApprovalItem {
 export class Aprovacoes implements OnInit {
   private advanceRequest = inject(AdvanceRequestService);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef); // ✨ ADICIONADO
-  
+  private route = inject(ActivatedRoute); // ✅ NOVO
+  private cdr = inject(ChangeDetectorRef);
+
   search = '';
   statusFilter = '';
   dateFrom = '';
@@ -42,7 +43,15 @@ export class Aprovacoes implements OnInit {
 
   ngOnInit(): void {
     console.log('Aprovacoes ngOnInit chamado');
-    this.loadApprovals();
+
+    // ✅ Captura o filtro de status da query string
+    this.route.queryParams.subscribe((params) => {
+      if (params['status']) {
+        console.log('📌 Filtro de status recebido:', params['status']);
+        this.statusFilter = params['status'];
+      }
+      this.loadApprovals();
+    });
   }
 
   loadApprovals(): void {
@@ -53,8 +62,8 @@ export class Aprovacoes implements OnInit {
 
     this.loading = true;
     this.errorMessage = '';
-    this.cdr.detectChanges(); // ✨ FORÇA ATUALIZAÇÃO DO LOADING
-    
+    this.cdr.detectChanges();
+
     const params = {
       search: this.search,
       status: this.statusFilter,
@@ -68,7 +77,7 @@ export class Aprovacoes implements OnInit {
       next: (data: any[]) => {
         console.log('Dados de aprovações recebidos:', data);
 
-        this.allApprovals = data.map(item => ({
+        this.allApprovals = data.map((item) => ({
           id: item.id,
           requester: item.solicitanteNome,
           description: item.descricao,
@@ -80,16 +89,14 @@ export class Aprovacoes implements OnInit {
 
         this.loading = false;
         this.applyFilters();
-        
+
         console.log('Aprovações carregadas:', this.filteredApprovals.length);
-        
-        // ✨ FORÇA A DETECÇÃO DE MUDANÇAS
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erro ao carregar aprovações:', err);
         this.loading = false;
-        
+
         if (err.status === 0) {
           this.errorMessage = 'Falha de conexão. Verifique se a API está rodando.';
         } else if (err.status === 400) {
@@ -97,10 +104,9 @@ export class Aprovacoes implements OnInit {
         } else {
           this.errorMessage = 'Falha ao carregar aprovações.';
         }
-        
-        // ✨ FORÇA A DETECÇÃO DE MUDANÇAS NO ERRO TAMBÉM
+
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -125,9 +131,9 @@ export class Aprovacoes implements OnInit {
       }
       return true;
     });
-    
+
     this.currentPage = 1;
-    this.cdr.detectChanges(); // ✨ FORÇA ATUALIZAÇÃO APÓS FILTRAR
+    this.cdr.detectChanges();
   }
 
   get totalPages(): number {
@@ -142,14 +148,14 @@ export class Aprovacoes implements OnInit {
   prevPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.cdr.detectChanges(); // ✨ FORÇA ATUALIZAÇÃO
+      this.cdr.detectChanges();
     }
   }
 
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.cdr.detectChanges(); // ✨ FORÇA ATUALIZAÇÃO
+      this.cdr.detectChanges();
     }
   }
 
@@ -158,21 +164,35 @@ export class Aprovacoes implements OnInit {
     this.statusFilter = '';
     this.dateFrom = '';
     this.dateTo = '';
+
+    // ✅ Remove queryParams ao limpar filtros
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+    });
+
     this.loadApprovals();
   }
 
-  verAdiantamento(id: number): void {
-  this.router.navigate(['/ver-adiantamento'], {
-    queryParams: { id: id }
-  });
-}
+  // ✅ NAVEGAÇÃO SEM CLIQUE DUPLO
+  verAdiantamento(id: number, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
 
-  goToEdit(id: number): void { 
-    this.router.navigate(['/editar-adiantamento'], { 
-      queryParams: { id: id }
+    this.router.navigate(['/ver-adiantamento'], {
+      queryParams: { id: id },
     });
   }
-  
+
+  goToEdit(id: number, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.router.navigate(['/editar-adiantamento'], {
+      queryParams: { id: id },
+    });
+  }
+
   formatMoney(v: number, currency = 'BRL'): string {
     const locale = 'pt-BR';
     const cur = currency || 'BRL';

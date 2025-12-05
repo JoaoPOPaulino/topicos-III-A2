@@ -421,3 +421,211 @@
     height: 200px;
   }
 }
+
+/* CONTEÚDO BASE JÁ EXISTE - ADICIONAR ESTAS REGRAS: */
+
+/* ========== LOADING OVERLAY ========== */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 15px;
+  border: 1px solid #E5E7EB;
+}
+
+.spinner-large {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #E5E7EB;
+  border-top-color: #004AAD;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+  margin: 0;
+  color: #6B7280;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ========== ERROR BANNER ========== */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #FEE2E2;
+  border: 1px solid #E63946;
+  border-left: 4px solid #E63946;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  color: #991B1B;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.error-banner svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #E63946;
+}
+
+/* ========== CARDS CLICÁVEIS ========== */
+.stat-card.clickable {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card.clickable::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 74, 173, 0.05), transparent);
+  transition: left 0.5s;
+}
+
+.stat-card.clickable:hover::before {
+  left: 100%;
+}
+
+.stat-card.clickable:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 74, 173, 0.15);
+  border-color: #004AAD;
+}
+
+.stat-card.clickable:active {
+  transform: translateY(-2px);
+}
+
+/* Indicador de clicável */
+.card-hover-indicator {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 32px;
+  height: 32px;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.clickable:hover .card-hover-indicator {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.card-hover-indicator svg {
+  width: 18px;
+  height: 18px;
+  color: #004AAD;
+}
+
+/* ========== ATIVIDADES CLICÁVEIS ========== */
+.activity-item.clickable {
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 12px;
+  margin: -12px;
+  transition: all 0.2s;
+}
+
+.activity-item.clickable:hover {
+  background: #F7F9FB;
+  transform: translateX(4px);
+}
+
+.activity-item.clickable:active {
+  transform: translateX(2px);
+}
+
+/* ========== CHART DATA LIST ========== */
+.chart-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  width: 100%;
+}
+
+.chart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #E5E7EB;
+  transition: all 0.2s;
+}
+
+.chart-item:hover {
+  background: #F7F9FB;
+  border-color: #004AAD;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chart-item .label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+
+.chart-item .count {
+  font-size: 14px;
+  font-weight: 700;
+  color: #004AAD;
+  padding: 4px 12px;
+  background: #F7F9FB;
+  border-radius: 8px;
+}
+
+/* ========== BOTÃO ATUALIZAR COM LOADING ========== */
+.btn-secondary:disabled {
+  background: #F7F9FB;
+  color: #9CA3AF;
+  cursor: not-allowed;
+  border-color: #E5E7EB;
+}
+
+/* ========== RESPONSIVE ADDITIONS ========== */
+@media (max-width: 480px) {
+  .card-hover-indicator {
+    display: none;
+  }
+
+  .stat-card.clickable:hover {
+    transform: translateY(-2px);
+  }
+
+  .activity-item.clickable:hover {
+    transform: translateX(0);
+  }
+}
