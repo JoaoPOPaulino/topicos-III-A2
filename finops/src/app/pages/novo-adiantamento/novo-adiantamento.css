@@ -270,6 +270,107 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
+/* ✨ VALIDAÇÃO DE DATA COM FERIADOS */
+
+/* Wrapper para input de data com loading */
+.date-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Spinner de validação */
+.validation-spinner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.spinner-icon {
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mensagem de aviso de data ajustada */
+.date-warning-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFF4CC 100%);
+  border: 1px solid #F59E0B;
+  border-left: 4px solid #F59E0B;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #92400E;
+  animation: slideDown 0.3s ease-out;
+}
+
+.date-warning-message svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  color: #F59E0B;
+}
+
+.date-warning-message span {
+  flex: 1;
+  font-weight: 500;
+}
+
+/* Variação para feriado (mais festiva) */
+.date-warning-message.holiday {
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  border-color: #3B82F6;
+  border-left-color: #3B82F6;
+  color: #1E40AF;
+}
+
+.date-warning-message.holiday svg {
+  color: #3B82F6;
+}
+
+/* Input com data ajustada */
+input[type="date"].adjusted {
+  border-color: #F59E0B;
+  background: #FFFBEB;
+}
+
+input[type="date"].adjusted:focus {
+  border-color: #F59E0B;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Animação de entrada */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* NEW ITEM CONTAINER */
 .new-item-container {
   display: flex;
@@ -460,10 +561,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   display: inline-block;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .content {
@@ -500,6 +597,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     width: 100%;
     justify-content: flex-end;
   }
+
+  .date-input-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .validation-spinner {
+    margin-top: 6px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -515,5 +621,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   .btn-cancel {
     width: 40px;
     height: 40px;
+  }
+
+  .date-warning-message {
+    font-size: 12px;
+    padding: 10px 14px;
   }
 }

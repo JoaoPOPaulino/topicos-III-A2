@@ -30,7 +30,7 @@ interface AdvanceRequestDetailDto extends AdvanceRequestListDto {
   colaboradorId: number;
   departamentoId: number;
   moedaId: number;
-  
+
   justificativaCompleta: string;
   departamentoNome: string;
   dataPagamentoRequerida: string;
@@ -38,6 +38,15 @@ interface AdvanceRequestDetailDto extends AdvanceRequestListDto {
   observacoes: string | null;
   criadoPorNome: string;
   anexos: string[];
+}
+
+interface DateValidationResponse {
+  originalDate: string;
+  isHoliday: boolean;
+  isWeekend: boolean;
+  adjustedDate: string;
+  wasAdjusted: boolean;
+  message: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -73,7 +82,12 @@ export class AdvanceRequestService {
   }
 
   changeStatus(id: number, newStatus: number): Observable<void> {
-        const params = new HttpParams().set('newStatus', newStatus); 
-        return this.http.patch<void>(`${this.baseUrl}/${id}/status`, null, { params });
-    }
+    const params = new HttpParams().set('newStatus', newStatus);
+    return this.http.patch<void>(`${this.baseUrl}/${id}/status`, null, { params });
+  }
+
+  validatePaymentDate(date: string): Observable<DateValidationResponse> {
+    const params = new HttpParams().set('date', date);
+    return this.http.get<DateValidationResponse>(`${this.baseUrl}/ValidateDate`, { params });
+  }
 }

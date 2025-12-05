@@ -6,6 +6,15 @@ import { Location } from '@angular/common';
 import { DataService } from '../../service/data';
 import { AdvanceRequestService } from '../../service/advence-request';
 
+interface DateValidationResponse {
+  originalDate: string;
+  isHoliday: boolean;
+  isWeekend: boolean;
+  adjustedDate: string;
+  wasAdjusted: boolean;
+  message: string;
+}
+
 @Component({
   selector: 'app-novo-adiantamento',
   standalone: true,
@@ -28,6 +37,12 @@ export class NovoAdiantamento implements OnInit {
   profileMenuOpen = false;
   showSuccessAlert = false;
   isLoading = false;
+
+  // ✨ Validação de Feriados
+  dateWarningMessage = '';
+  isValidatingDate = false;
+  adjustedDate: string | null = null;
+  isHolidayWarning = false; // Para estilização diferente
 
   showNewColaboradorInput = false;
   showNewDepartamentoInput = false;
@@ -194,6 +209,90 @@ export class NovoAdiantamento implements OnInit {
     event.target.value = v;
   }
 
+  // ✨ VALIDAÇÃO DE DATA COM FERIADOS
+  onDateChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const selectedDate = input.value; // Formato: YYYY-MM-DD
+
+    if (!selectedDate) {
+      this.dateWarningMessage = '';
+      this.adjustedDate = null;
+      this.isHolidayWarning = false;
+      return;
+    }
+
+    // Valida se a data é no passado
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selected = new Date(selectedDate + 'T00:00:00');
+
+    if (selected < today) {
+      this.dateWarningMessage = '⚠️ A data não pode ser no passado.';
+      this.adjustedDate = null;
+      this.isHolidayWarning = false;
+      this.formErrors.dataPagamentoRequerida = true;
+      return;
+    }
+
+    // Limpa erro de validação local
+    this.formErrors.dataPagamentoRequerida = false;
+
+    // Chama a API para validar feriados
+    this.validateDateWithApi(selectedDate);
+  }
+
+  private validateDateWithApi(date: string): void {
+    this.isValidatingDate = true;
+    this.dateWarningMessage = '';
+    this.isHolidayWarning = false;
+
+    console.log('📅 Validando data:', date);
+
+    this.advanceService.validatePaymentDate(date).subscribe({
+      next: (response: DateValidationResponse) => {
+        console.log('📅 Resposta da validação:', response);
+        this.isValidatingDate = false;
+
+        if (response.wasAdjusted) {
+          // Data foi ajustada para o próximo dia útil
+          this.adjustedDate = response.adjustedDate;
+
+          const originalDate = new Date(response.originalDate + 'T00:00:00');
+          const adjusted = new Date(response.adjustedDate + 'T00:00:00');
+
+          const originalFormatted = originalDate.toLocaleDateString('pt-BR');
+          const adjustedFormatted = adjusted.toLocaleDateString('pt-BR');
+
+          if (response.isWeekend) {
+            this.dateWarningMessage = `📅 A data ${originalFormatted} cai em um fim de semana. A data será ajustada para ${adjustedFormatted} (próximo dia útil).`;
+            this.isHolidayWarning = false;
+          } else if (response.isHoliday) {
+            this.dateWarningMessage = `🎉 A data ${originalFormatted} é um feriado nacional. A data será ajustada para ${adjustedFormatted} (próximo dia útil).`;
+            this.isHolidayWarning = true;
+          }
+
+          // Atualiza o campo do formulário com a data ajustada
+          this.form.dataPagamentoRequerida = response.adjustedDate;
+
+        } else {
+          // Data é válida (dia útil)
+          this.dateWarningMessage = '';
+          this.adjustedDate = null;
+          this.isHolidayWarning = false;
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('❌ Erro ao validar data:', err);
+        this.isValidatingDate = false;
+        this.dateWarningMessage = '⚠️ Não foi possível validar a data. Tente novamente.';
+        this.isHolidayWarning = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
   validateForm(): boolean {
     this.formErrors.colaboradorId = !this.form.colaboradorId || this.form.colaboradorId === 0;
     this.formErrors.departamentoId = !this.form.departamentoId || this.form.departamentoId === 0;
@@ -214,22 +313,27 @@ export class NovoAdiantamento implements OnInit {
     this.isLoading = true;
     const valorLimpo = this.normalizeValor(this.form.valorMascarado);
 
+    // ✅ Usa a data ajustada se existir, senão usa a data do form
+    const finalDate = this.adjustedDate || this.form.dataPagamentoRequerida;
+
     const dto = {
       colaboradorId: this.form.colaboradorId,
       departamentoId: this.form.departamentoId,
       moedaId: this.form.moedaId,
       valor: valorLimpo,
       justificativa: this.form.justificativa,
-      dataPagamentoRequerida: this.form.dataPagamentoRequerida,
-      observacoes: this.form.observacoes,
+      dataPagamentoRequerida: finalDate, // ✅ Data validada
+      observacoes: this.form.observacoes || null,
     };
 
-    console.log('Enviando adiantamento:', dto);
+    console.log('📤 Enviando adiantamento:', dto);
 
     this.advanceService.createAdvanceRequest(dto as any).subscribe({
       next: (response) => {
+        console.log('✅ Adiantamento criado:', response);
         this.isLoading = false;
         this.showSuccessAlert = true;
+
         setTimeout(() => {
           this.showSuccessAlert = false;
           this.router.navigate(['/adiantamentos']);
@@ -237,7 +341,7 @@ export class NovoAdiantamento implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        console.error('Erro ao salvar:', err);
+        console.error('❌ Erro ao salvar:', err);
         const msg = err.error?.message || 'Erro ao comunicar com o servidor.';
         alert(`Falha ao criar adiantamento: ${msg}`);
       },
