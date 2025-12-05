@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 	  <Compile Remove="Controllers\UsersController.cs" />
+	  <Compile Remove="DTOs\AwesomeApiRateResponse.cs" />
 	  <Compile Remove="Models\Enums\SolicitacaoAdiantamentoDetailDto.cs" />
 	</ItemGroup>
 
