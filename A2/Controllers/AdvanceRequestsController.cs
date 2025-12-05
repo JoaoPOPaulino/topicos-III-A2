@@ -227,5 +227,38 @@ namespace A2.Controllers
                 return StatusCode(500, new { erro = ex.Message });
             }
         }
+
+        [HttpGet("ValidateDate")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ValidatePaymentDate([FromQuery] DateTime date)
+        {
+            try
+            {
+                var isHoliday = await _service.IsHolidayAsync(date);
+                var nextBusinessDay = await _service.GetNextBusinessDayAsync(date);
+
+                var response = new
+                {
+                    OriginalDate = date.ToString("yyyy-MM-dd"),
+                    IsHoliday = isHoliday,
+                    IsWeekend = date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday,
+                    AdjustedDate = nextBusinessDay.ToString("yyyy-MM-dd"),
+                    WasAdjusted = date.Date != nextBusinessDay.Date,
+                    Message = date.Date != nextBusinessDay.Date
+                        ? $"Data ajustada de {date:dd/MM/yyyy} para {nextBusinessDay:dd/MM/yyyy} (próximo dia útil)"
+                        : "Data é um dia útil"
+                };
+
+                _logger.LogInformation("Validação de data: {Original} -> {Adjusted} (Ajustado: {WasAdjusted})",
+                    date.Date, nextBusinessDay.Date, response.WasAdjusted);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao validar data de pagamento.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao validar data.");
+            }
+        }
     }
 }

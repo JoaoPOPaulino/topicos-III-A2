@@ -1,35 +1,35 @@
 ﻿using A2.Data;
+using A2.Service;
 using A2.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Extensions.Http;
+using System;
 using System.Net;
 using System.Net.Http;
-using System;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Adicionar serviço de cache em memória (necessário para ExchangeRateService)
-builder.Services.AddMemoryCache();
 
 // ------------------------------------
 // 1. CONFIGURAÇÃO BASE
 // ------------------------------------
 
-// Configuração do EF Core e DbContext
+// 1.1. Cache em memória (necessário para ExchangeRateService)
+builder.Services.AddMemoryCache();
+
+// 1.2. Configuração do EF Core e DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 1.2. Configuração CORS (CRÍTICO para integração Angular)
+// 1.3. Configuração CORS (para integração Angular)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",
         policy =>
         {
-            // Permite requisições do front-end Angular local
             policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
@@ -37,72 +37,89 @@ builder.Services.AddCors(options =>
 });
 
 // ------------------------------------
-// 2. CONFIGURAÇÃO DE POLÍTICA DE RESILIÊNCIA (POLLY)
+// 2. POLÍTICA DE RESILIÊNCIA (POLLY)
 // ------------------------------------
 
-// Função que define a política de retentativa
 static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
 {
     return HttpPolicyExtensions
-        // Lida com erros 5xx e timeouts
-        .HandleTransientHttpError()
-        // Lida com o erro 429
-        .OrResult(msg => msg.StatusCode == HttpStatusCode.TooManyRequests)
+        .HandleTransientHttpError() // 5xx, 408, network failures
+        .OrResult(msg => msg.StatusCode == HttpStatusCode.TooManyRequests) // 429
         .WaitAndRetryAsync(
             retryCount: 3,
-            sleepDurationProvider: retryAttempt =>
+            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+            onRetry: (outcome, timespan, retryAttempt, context) =>
             {
-                // Retentativa exponencial padrão: 2s, 4s, 8s
-                return TimeSpan.FromSeconds(Math.Pow(2, retryAttempt));
+                Console.WriteLine($"⚠️ Tentativa {retryAttempt} falhou. Aguardando {timespan.TotalSeconds}s...");
             }
         );
 }
 
+static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .CircuitBreakerAsync(
+            handledEventsAllowedBeforeBreaking: 5,
+            durationOfBreak: TimeSpan.FromMinutes(1),
+            onBreak: (outcome, duration) =>
+            {
+                Console.WriteLine($"🔴 Circuit Breaker ABERTO por {duration.TotalSeconds}s");
+            },
+            onReset: () => Console.WriteLine("🟢 Circuit Breaker FECHADO")
+        );
+}
+
 // ------------------------------------
-// 3. REGISTRO DE SERVIÇOS E CLIENTES HTTP
+// 3. REGISTRO DE CLIENTES HTTP
 // ------------------------------------
 
-// Registro principal dos serviços de lógica de negócio (REMOVENDO DUPLICATAS)
+// 3.1. Cliente HTTP para AwesomeAPI com Polly
+builder.Services
+    .AddHttpClient("AwesomeApiCambiaria", client =>
+    {
+        client.BaseAddress = new Uri("https://economia.awesomeapi.com.br/");
+        client.Timeout = TimeSpan.FromSeconds(10);
+    })
+    .AddPolicyHandler(GetRetryPolicy())
+    .AddPolicyHandler(GetCircuitBreakerPolicy());
+
+// 3.2. HttpClientFactory genérico (para HolidayService e outros)
+builder.Services.AddHttpClient();
+
+// ------------------------------------
+// 4. REGISTRO DE SERVIÇOS DE NEGÓCIO
+// ------------------------------------
+
+// ✅ Serviços principais (SEM DUPLICATAS)
 builder.Services.AddScoped<ISolicitacaoAdiantamentoService, SolicitacaoAdiantamentoService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
 builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
 builder.Services.AddScoped<IPrestacaoContasService, PrestacaoContasService>();
 
-// Registra o cliente HTTP para a AwesomeAPI com a política de Polly (simples)
-builder.Services
-    .AddHttpClient("AwesomeApiCambiaria")
-    .AddPolicyHandler(GetRetryPolicy())
-    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler());
-
-// Registra um cliente HTTP padrão (útil para o HolidayService)
-builder.Services.AddHttpClient();
+// ✅ CRÍTICO: Registrar CurrencyService como Scoped (NÃO como HttpClient)
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 
 // ------------------------------------
-// 4. CONFIGURAÇÃO MVC E SWAGGER
+// 5. CONFIGURAÇÃO MVC E SWAGGER
 // ------------------------------------
 
-// Adiciona suporte a Controllers (necessário para as APIs e Views)
 builder.Services.AddControllersWithViews();
-
-// Configuração do Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 var app = builder.Build();
 
 // ------------------------------------
-// 5. CONFIGURAÇÃO DO PIPELINE HTTP
+// 6. PIPELINE HTTP
 // ------------------------------------
 
-// Configuração do Swagger Middleware (Apenas em Development)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-if (!app.Environment.IsDevelopment())
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -110,16 +127,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
-// 5.1. Usar o Middleware CORS
-app.UseCors("AllowAngularApp");
-
+app.UseCors("AllowAngularApp"); // ✅ CORS antes de Authorization
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

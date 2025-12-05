@@ -41,6 +41,8 @@ namespace A2.Data
         // Feriados
         public DbSet<Feriado> Feriados { get; set; }
 
+        public DbSet<ConversionHistory> ConversionHistories { get; set; }
+
 
 
         // ------------------------------------

@@ -263,5 +263,19 @@ namespace A2.Services
             _context.SolicitacoesAdiantamento.Update(solicitacao);
             await _context.SaveChangesAsync();
         }
+
+        // ---------------------------------------------------------------------
+        // VALIDAÇÃO DE FERIADOS - Delega para HolidayService
+        // ---------------------------------------------------------------------
+
+        public async Task<bool> IsHolidayAsync(DateTime date)
+        {
+            return await _holidayService.IsHolidayAsync(date);
+        }
+
+        public async Task<DateTime> GetNextBusinessDayAsync(DateTime date)
+        {
+            return await _holidayService.GetNextBusinessDayAsync(date);
+        }
     }
 }

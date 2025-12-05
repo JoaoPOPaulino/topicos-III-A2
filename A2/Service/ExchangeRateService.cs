@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 
 namespace A2.Services
 {
-    // Interface IExchangeRateService é assumida
     public class ExchangeRateService : IExchangeRateService
     {
         private readonly ApplicationDbContext _context;
@@ -23,7 +22,8 @@ namespace A2.Services
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<ExchangeRateService> _logger;
 
-        private const string AwesomeApiBaseUrl = "https://economia.awesomeapi.com.br/json/daily/";
+        // ✅ API correta: https://economia.awesomeapi.com.br/last/USD-BRL
+        private const string AwesomeApiLastUrl = "https://economia.awesomeapi.com.br/last/";
 
         public ExchangeRateService(
             ApplicationDbContext context,
@@ -47,13 +47,16 @@ namespace A2.Services
             var moedaCotada = await _context.Moedas.FindAsync(moedaCotadaId)
                 ?? throw new KeyNotFoundException($"Moeda cotada ID {moedaCotadaId} não encontrada.");
 
+            _logger.LogInformation("🔄 Buscando taxa: {Base} → {Cotada}", moedaBase.Codigo, moedaCotada.Codigo);
+
             string cacheKey = $"rate_{moedaBaseId}_{moedaCotadaId}_{date:yyyy-MM-dd}";
             decimal rate = 0;
 
             // 1. Verificar cache em memória
             if (_memoryCache.TryGetValue(cacheKey, out rate))
             {
-                _logger.LogInformation($"Taxa de {moedaCotada.Codigo}-{moedaBase.Codigo} ({date:yyyy-MM-dd}) encontrada no cache de memória.");
+                _logger.LogInformation("✅ Taxa encontrada no CACHE: {Base}/{Cotada} = {Rate}",
+                    moedaBase.Codigo, moedaCotada.Codigo, rate);
                 return rate;
             }
 
@@ -68,19 +71,23 @@ namespace A2.Services
             if (rate > 0)
             {
                 _memoryCache.Set(cacheKey, rate, TimeSpan.FromHours(24));
-                _logger.LogInformation($"Taxa de {moedaCotada.Codigo}-{moedaBase.Codigo} ({date:yyyy-MM-dd}) encontrada no banco.");
+                _logger.LogInformation("✅ Taxa encontrada no BANCO: {Base}/{Cotada} = {Rate}",
+                    moedaBase.Codigo, moedaCotada.Codigo, rate);
                 return rate;
             }
 
             // 3. Buscar na API externa (protegida pelo Polly)
             try
             {
-                // Se a API falhar (Polly desiste), uma exceção será lançada aqui
+                _logger.LogInformation("🌐 Consultando AwesomeAPI...");
                 rate = await GetRateFromAwesomeApi(moedaBase.Codigo, moedaCotada.Codigo, date);
 
-                // 4. Salvar no banco e cache (APENAS se veio com sucesso da API)
+                // 4. Salvar no banco e cache
                 if (rate > 0)
                 {
+                    _logger.LogInformation("✅ Taxa obtida da API: {Base}/{Cotada} = {Rate}",
+                        moedaBase.Codigo, moedaCotada.Codigo, rate);
+
                     var log = new LogCotacao
                     {
                         MoedaBaseId = moedaBaseId,
@@ -97,22 +104,21 @@ namespace A2.Services
             }
             catch (Exception ex)
             {
-                // O Polly falhou (Taxa de requisição excedida, falha de rede persistente, etc.)
-                _logger.LogWarning(ex, $"Falha persistente na AwesomeAPI. Tentando fallback para taxa recente...");
+                _logger.LogWarning(ex, "⚠️ Falha na AwesomeAPI. Tentando fallback...");
 
-                // Tentativa de Fallback 1: Taxa mais recente do banco
+                // Fallback 1: Taxa mais recente do banco
                 rate = await GetMostRecentRate(moedaBaseId, moedaCotadaId);
 
                 if (rate > 0)
                 {
-                    _logger.LogWarning($"Usando taxa recente ({rate}) do banco como fallback.");
+                    _logger.LogWarning("✅ Usando taxa recente do banco: {Rate}", rate);
                     _memoryCache.Set(cacheKey, rate, TimeSpan.FromHours(24));
                     return rate;
                 }
 
-                // Tentativa de Fallback 2: Taxa de emergência (hardcoded)
+                // Fallback 2: Taxa de emergência (hardcoded)
                 rate = GetEmergencyRate(moedaBase.Codigo, moedaCotada.Codigo);
-                _logger.LogError($"Falha total na cotação. Usando taxa de emergência: {rate}");
+                _logger.LogError("⚠️ Usando taxa de EMERGÊNCIA: {Rate}", rate);
 
                 return rate;
             }
@@ -122,35 +128,87 @@ namespace A2.Services
 
         private async Task<decimal> GetRateFromAwesomeApi(string moedaBase, string moedaCotada, DateTime date)
         {
+            // ✅ AwesomeAPI sempre retorna a taxa de X para BRL
+            // Exemplo: USD-BRL retorna quanto vale 1 USD em BRL
+
             if (moedaBase != "BRL" && moedaCotada != "BRL")
             {
                 throw new InvalidOperationException("A AwesomeAPI só suporta conversão que envolva BRL.");
             }
-            string pair = $"{moedaCotada}-{moedaBase}";
 
             var client = _httpClientFactory.CreateClient("AwesomeApiCambiaria");
-            long timestamp = new DateTimeOffset(date.Date).ToUnixTimeSeconds();
-            string url = $"{AwesomeApiBaseUrl}{pair}/1?end_date={timestamp}";
 
-            // O cliente com Polly será usado aqui
+            // ✅ CORREÇÃO: Determinar o par correto
+            string pair;
+            bool needsInversion = false;
+
+            if (moedaBase == "BRL")
+            {
+                // BRL → USD: API retorna USD-BRL (quanto vale 1 USD em BRL)
+                // Precisamos inverter: 1 / (USD-BRL) = BRL-USD
+                pair = $"{moedaCotada}-{moedaBase}"; // USD-BRL
+                needsInversion = true;
+            }
+            else
+            {
+                // USD → BRL: API retorna USD-BRL (quanto vale 1 USD em BRL)
+                // Já é o que queremos
+                pair = $"{moedaBase}-{moedaCotada}"; // USD-BRL
+                needsInversion = false;
+            }
+
+            // ✅ Usar endpoint /last para pegar cotação mais recente
+            string url = $"{AwesomeApiLastUrl}{pair}";
+
+            _logger.LogInformation("📡 Chamando API: {Url}", url);
+
             var response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode(); // Lança exceção se todas as retentativas falharem
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("❌ API retornou status {Status}", response.StatusCode);
+                throw new HttpRequestException($"AwesomeAPI retornou {response.StatusCode}");
+            }
 
             var json = await response.Content.ReadAsStringAsync();
+            _logger.LogDebug("📄 Resposta da API: {Json}", json);
 
-            // Assumindo que AwesomeApiRateResponse é a classe correta
-            var rates = JsonSerializer.Deserialize<List<AwesomeApiRateResponse>>(json, new JsonSerializerOptions
+            // ✅ Parse da resposta
+            // Formato: { "USDBRL": { "bid": "5.3100", ... } }
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            // Remove hífen do par para acessar a propriedade
+            var pairKey = pair.Replace("-", "");
+
+            if (!root.TryGetProperty(pairKey, out var rateData))
             {
-                PropertyNameCaseInsensitive = true
-            });
+                _logger.LogWarning("❌ Par {Pair} não encontrado na resposta", pairKey);
+                throw new InvalidOperationException($"Par {pair} não encontrado na resposta da API");
+            }
 
-            if (rates == null || !rates.Any())
-                throw new InvalidOperationException($"Nenhuma cotação encontrada para {pair} na data {date.ToShortDateString()}.");
+            if (!rateData.TryGetProperty("bid", out var bidElement))
+            {
+                _logger.LogWarning("❌ Campo 'bid' não encontrado");
+                throw new InvalidOperationException("Campo 'bid' não encontrado na resposta");
+            }
 
-            if (!decimal.TryParse(rates.First().Bid, out decimal rate))
-                throw new InvalidOperationException("Erro ao converter taxa.");
+            var bidString = bidElement.GetString();
 
-            return rate;
+            if (!decimal.TryParse(bidString, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out decimal apiRate))
+            {
+                _logger.LogWarning("❌ Erro ao converter taxa: {Bid}", bidString);
+                throw new InvalidOperationException($"Erro ao converter taxa: {bidString}");
+            }
+
+            // ✅ Inverter se necessário
+            decimal finalRate = needsInversion ? (1.0m / apiRate) : apiRate;
+
+            _logger.LogInformation("✅ Taxa da API: {ApiRate}, Final: {FinalRate} (Invertido: {Inverted})",
+                apiRate, finalRate, needsInversion);
+
+            return finalRate;
         }
 
         private async Task<decimal> GetMostRecentRate(int moedaBaseId, int moedaCotadaId)
@@ -166,25 +224,36 @@ namespace A2.Services
 
         private decimal GetEmergencyRate(string moedaBase, string moedaCotada)
         {
+            // ✅ Taxas de emergência CORRETAS (1 USD = 5.31 BRL, então 1 BRL = 0.188 USD)
             var emergencyRates = new Dictionary<string, decimal>
             {
-                ["USD-BRL"] = 5.00m,
-                ["EUR-BRL"] = 5.50m,
+                // Quanto vale 1 moeda da chave em reais
+                ["USD-BRL"] = 5.31m,  // 1 USD = 5.31 BRL
+                ["EUR-BRL"] = 5.80m,  // 1 EUR = 5.80 BRL
+                ["GBP-BRL"] = 6.80m,  // 1 GBP = 6.80 BRL
             };
 
-            string key = $"{moedaCotada}-{moedaBase}";
-
-            if (emergencyRates.TryGetValue(key, out var rate))
-                return rate;
-
-            // Lógica para conversão inversa (ex: BRL-USD)
-            string inverseKey = $"{moedaBase}-{moedaCotada}";
-
-            if (emergencyRates.TryGetValue(inverseKey, out rate))
+            // Tenta BRL → Moeda
+            if (moedaBase == "BRL")
             {
-                return 1.0m / rate;
+                string key = $"{moedaCotada}-{moedaBase}";
+                if (emergencyRates.TryGetValue(key, out var rate))
+                {
+                    return 1.0m / rate; // Inverte
+                }
             }
 
+            // Tenta Moeda → BRL
+            if (moedaCotada == "BRL")
+            {
+                string key = $"{moedaBase}-{moedaCotada}";
+                if (emergencyRates.TryGetValue(key, out var rate))
+                {
+                    return rate;
+                }
+            }
+
+            _logger.LogWarning("⚠️ Nenhuma taxa de emergência encontrada, retornando 1.0");
             return 1.0m;
         }
     }

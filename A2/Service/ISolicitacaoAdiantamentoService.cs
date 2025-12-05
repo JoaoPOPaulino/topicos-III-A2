@@ -19,5 +19,9 @@ namespace A2.Services
         Task<SolicitacaoAdiantamentoDetailDto?> GetByIdAsync(int id);
 
         Task ChangeStatusAsync(int id, StatusAdiantamento novoStatus);
+
+        Task<bool> IsHolidayAsync(DateTime date);
+        Task<DateTime> GetNextBusinessDayAsync(DateTime date);
+
     }
 }
